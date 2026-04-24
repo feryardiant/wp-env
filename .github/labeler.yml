@@ -1,0 +1,18 @@
+github_actions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**.yml'
+
+'pkg: custom-theme':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'packages/custom-theme/**'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/**'
+
+enhancement:
+  - changed-files:
+      - any-glob-to-any-file: '**'
