@@ -1,0 +1,23 @@
+github_actions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**.yml'
+
+'pkg: cf7-entry-manager':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'packages/cf7-entry-manager/**'
+
+'pkg: custom-theme':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'packages/custom-theme/**'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/**'
+
+enhancement:
+  - changed-files:
+      - any-glob-to-any-file: '**'

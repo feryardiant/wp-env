@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<ruleset
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="Custom Coding Standards">
+
+    <!--
+    Pass some flags to PHPCS:
+	- p flag: Show progress of the run.
+	- s flag: Show sniff codes in all reports.
+	-->
+	<arg value="ps"/>
+
+	<!-- Color the result output. -->
+	<arg name="colors" />
+
+	<!-- Check up to 8 files simultanously. -->
+	<arg name="parallel" value="8"/>
+
+    <!-- Only check the PHP files. SCSS and JS files are checked separately. -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Check all files in this directory and the directories below it. -->
+    <file>./</file>
+
+    <exclude-pattern>*/\.git/*</exclude-pattern>
+    <exclude-pattern>*/\.cache/*</exclude-pattern>
+	<exclude-pattern>*\.old/*</exclude-pattern>
+	<exclude-pattern>*/assets/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+
+    <rule ref="WordPress">
+        <!-- Allows: Variable assignment in condition, e.g. `if ( $var = some_func() ) { ... }` -->
+        <exclude name="Generic.CodeAnalysis.AssignmentInCondition.Found" />
+
+        <!--
+        This is actually somewhat missleading, happens to `Page_Element::when()` in
+        `./packages/cf7-entry-manager/includes/class-page-element.php`, where `$met`
+        param is actually a `Closure(self)` but even I wrote it correctly `phpcs` keeps
+        complaining, like I was write it using `Closure` type hint. It says:
+        __Expected type hint "Closure(self)"; found "Closure" for $met__
+        -->
+        <exclude name="Squiz.Commenting.FunctionComment.IncorrectTypeHint" />
+
+        <!-- Allows: Commented-out code, e.g. `// $var = disabled_func();` -->
+        <exclude name="Squiz.PHP.CommentedOutCode.Found" />
+
+        <!-- Allows: Multiple variable assignments in a single statement, e.g. `list( $a, $b ) = some_func()` -->
+        <exclude name="Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure" />
+        <exclude name="Squiz.PHP.DisallowMultipleAssignments.Found" />
+
+        <!-- Allows: Short ternary operator, e.g. `$var = $a ?: $b` -->
+        <exclude name="Universal.Operators.DisallowShortTernary.Found" />
+
+        <!-- Allows: Assignment in ternary condition, e.g. `( $var = $a ) ? $b : $c` -->
+        <exclude name="WordPress.CodeAnalysis.AssignmentInTernaryCondition.FoundInTernaryCondition" />
+    </rule>
+
+    <rule ref="PHPCompatibilityWP" />
+</ruleset>

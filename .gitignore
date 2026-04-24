@@ -1,0 +1,62 @@
+# Generic
+# --------------------------
+Thumbs.db
+Desktop.ini
+.DS_Store
+.directory
+._*
+*.DS_Store
+*.old
+*.log
+*.tmp
+
+# caches
+.cache
+*.cache
+*.tsbuildinfo
+*~
+
+# distribution
+dist
+*.mo
+*.zip
+
+# IDE Project Configurations
+# --------------------------
+nbproject
+.idea
+.settings
+.vscode
+.project
+.zed
+GEMINI.md
+*.sublime-*
+
+# AI Agent
+# --------------------------
+.gemini
+conductor
+
+# Development
+# --------------------------
+.env.*
+.env
+vendor
+node_modules
+
+# code coverage
+coverage
+*.lcov
+
+# Other package managers
+packages/*/composer.lock
+yarn.lock
+pnpm-lock.yaml
+package-lock.json
+bun.lockb
+
+# But Keep these
+# --------------------------
+!.env.example
+!.env.*.example
+!.gitkeep

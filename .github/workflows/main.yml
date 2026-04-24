@@ -1,0 +1,104 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  prepare:
+    name: Prepare
+    uses: projek-xyz/actions/.github/workflows/configure.yml@main
+    secrets: inherit
+    with:
+      php-version: 8.1
+
+    permissions:
+      pull-requests: write
+      contents: read
+
+  run:
+    name: with WP ${{ matrix.wp }} on PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    needs: [prepare]
+
+    env:
+      DB_NAME: ${{ github.repository_owner }}
+      DB_USER: ${{ github.repository_owner }}
+      DB_PASS: secret
+      PHP_VERSION: ${{ matrix.php }}
+      WP_VERSION: ${{ matrix.wp }}
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASS }}
+          MYSQL_DATABASE: ${{ env.DB_NAME }}
+          MYSQL_USER: ${{ env.DB_USER }}
+          MYSQL_PASSWORD: ${{ env.DB_PASS }}
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.1']
+        wp: ['6.0']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ vars.BUN_VERSION || '1.3.10' }}
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: xdebug
+
+      - name: Set up Composer Cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ needs.prepare.outputs.composer-cache-dir }}
+          key: ${{ needs.prepare.outputs.composer-cache-key }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ needs.prepare.outputs.composer-cache-key }}-composer-
+
+      - name: Set up WP-CLI Cache
+        uses: actions/cache@v5
+        with:
+          path: "/home/runner/.wp-cli/cache"
+          key: wp-${{ matrix.wp }}-wp-cli-${{ hashFiles('**/composer.lock') }}
+          restore-keys: wp-${{ matrix.wp }}-wp-cli-
+
+      - name: Install dependencies
+        run: |
+          composer update
+
+      - name: Set up WordPress
+        env:
+          DB_HOST: 127.0.0.1:${{ job.services.mysql.ports['3306'] }}
+          MULTISITE_ENABLED: 0
+          SITE_PLUGINS: blocksy-companion,jetpack,contact-form-7,plugin-check,woocommerce
+          SITE_THEMES: blocksy
+          WP_VERSION: ${{ matrix.wp }}
+        run: |
+          bash scripts/init-wp.sh
+
+      # - name: Lint
+      #   run: |
+      #     vendor/bin/phpcs
+
+      - name: Unit Test
+        run: |
+          vendor/bin/phpunit --coverage-text

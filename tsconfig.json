@@ -1,0 +1,18 @@
+{
+  "extends": "@tsconfig/bun/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+
+    "types": ["@types/bun"],
+
+    // Bundler mode
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+
+    // Best practices
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true
+  }
+}

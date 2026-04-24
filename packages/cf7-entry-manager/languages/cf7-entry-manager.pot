@@ -1,0 +1,286 @@
+# Copyright (C) 2026 Fery Wardiyanto
+# This file is distributed under the GPLv3 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Entry Manager for Contact Form 7 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/cf7-entry-manager\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-23T10:33:17+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: cf7-entry-manager\n"
+
+#. Plugin Name of the plugin
+#: cf7-entry-manager.php:10
+msgid "Entry Manager for Contact Form 7"
+msgstr ""
+
+#. Description of the plugin
+#: cf7-entry-manager.php:11
+msgid "Never lose a lead again. Save, manage, and convert every Contact Form 7 submission directly in your WordPress dashboard."
+msgstr ""
+
+#. Author of the plugin
+#: cf7-entry-manager.php:18
+msgid "Fery Wardiyanto"
+msgstr ""
+
+#. Author URI of the plugin
+#: cf7-entry-manager.php:19
+msgid "https://feryardiant.id"
+msgstr ""
+
+#. translators: %s: version of PHP required by Entry Manager for Contact Form 7 plugin.
+#: cf7-entry-manager.php:45
+#, php-format
+msgid "Entry <strong>Manager for Contact Form 7</strong> requires at least version <strong>%s</strong> of <strong>PHP</strong> and has been paused."
+msgstr ""
+
+#. translators: %s: version of WordPress required by Entry Manager for Contact Form 7 plugin.
+#: cf7-entry-manager.php:69
+#, php-format
+msgid "Entry <strong>Manager for Contact Form 7</strong> requires at least version <strong>%s</strong> of <strong>WordPress</strong> and has been paused."
+msgstr ""
+
+#. translators: %s: version of Contact Form 7 required by Entry Manager for Contact Form 7 plugin.
+#: cf7-entry-manager.php:123
+#, php-format
+msgid "Entry <strong>Manager for Contact Form 7</strong> requires at least version <strong>%s</strong> of <strong>Contact Form 7</strong> and has been paused."
+msgstr ""
+
+#: cf7-entry-manager.php:154
+msgid "Submissions"
+msgstr ""
+
+#: cf7-entry-manager.php:155
+msgid "Submission"
+msgstr ""
+
+#: cf7-entry-manager.php:156
+msgid "View Submission"
+msgstr ""
+
+#: cf7-entry-manager.php:157
+msgid "Search Submissions"
+msgstr ""
+
+#: cf7-entry-manager.php:158
+msgid "No submissions found."
+msgstr ""
+
+#: cf7-entry-manager.php:159
+msgid "No submissions found in Trash."
+msgstr ""
+
+#: cf7-entry-manager.php:160
+msgctxt "Screen reader text for the filter links heading on the post type listing screen."
+msgid "Filter submissions list"
+msgstr ""
+
+#: cf7-entry-manager.php:161
+msgctxt "Screen reader text for the pagination heading on the post type listing screen."
+msgid "Submissions list navigation"
+msgstr ""
+
+#: cf7-entry-manager.php:162
+msgctxt "Screen reader text for the items list heading on the post type listing screen."
+msgid "Submissions list"
+msgstr ""
+
+#: cf7-entry-manager.php:193
+msgid "Phone Number"
+msgstr ""
+
+#: includes/admin.php:180
+msgid "You can edit the way you treat each submissions here."
+msgstr ""
+
+#: includes/admin.php:266
+msgid "None selected"
+msgstr ""
+
+#. translators: %s: Contact form title
+#: includes/class-item.php:125
+#, php-format
+msgid "Submission for \"%s\""
+msgstr ""
+
+#: includes/class-list-table.php:35
+#: includes/class-option.php:211
+msgid "Subject"
+msgstr ""
+
+#: includes/class-list-table.php:36
+#: includes/view-entry.php:143
+msgid "Form"
+msgstr ""
+
+#: includes/class-list-table.php:37
+#: includes/class-option.php:232
+msgid "Author"
+msgstr ""
+
+#: includes/class-list-table.php:38
+msgid "Date"
+msgstr ""
+
+#. translators: %s: title of contact form
+#: includes/class-list-table.php:159
+#, php-format
+msgid "View \"%s\""
+msgstr ""
+
+#: includes/class-list-table.php:162
+msgid "View"
+msgstr ""
+
+#. translators: %s: title of contact form
+#: includes/class-list-table.php:172
+#, php-format
+msgid "Mark \"%s\" as read"
+msgstr ""
+
+#: includes/class-list-table.php:175
+msgid "Mark as read"
+msgstr ""
+
+#. translators: %s: title of submission
+#: includes/class-list-table.php:208
+#, php-format
+msgid "View &#8220;%s&#8221;"
+msgstr ""
+
+#: includes/class-list-table.php:231
+msgid "no author"
+msgstr ""
+
+#: includes/class-list-table.php:248
+#: includes/view-entry.php:151
+msgid "no form"
+msgstr ""
+
+#. translators: 1: date, 2: time
+#: includes/class-list-table.php:265
+#, php-format
+msgid "%1$s at %2$s"
+msgstr ""
+
+#. translators: date format, see https://www.php.net/date
+#: includes/class-list-table.php:267
+msgid "Y/m/d"
+msgstr ""
+
+#. translators: time format, see https://www.php.net/date
+#: includes/class-list-table.php:269
+msgid "g:i a"
+msgstr ""
+
+#: includes/class-option.php:203
+msgid "Record"
+msgstr ""
+
+#: includes/class-option.php:204
+msgid "Whether to record the submissions to the database"
+msgstr ""
+
+#: includes/class-option.php:212
+msgid "Choose which field is identified as a submission subject"
+msgstr ""
+
+#: includes/class-option.php:221
+msgid "Message"
+msgstr ""
+
+#: includes/class-option.php:222
+msgid "Choose which field is identified as a submission message"
+msgstr ""
+
+#: includes/class-option.php:233
+msgid "Whether the submission author will be registered as subscriber"
+msgstr ""
+
+#: includes/class-option.php:240
+msgid "Author Name"
+msgstr ""
+
+#: includes/class-option.php:241
+msgid "Choose which field is identified as the submitter's name"
+msgstr ""
+
+#: includes/class-option.php:250
+msgid "Author Email"
+msgstr ""
+
+#: includes/class-option.php:251
+msgid "Choose which field is identified as the submitter's email"
+msgstr ""
+
+#: includes/class-option.php:260
+msgid "Author Phone"
+msgstr ""
+
+#: includes/class-option.php:261
+msgid "Choose which field is identified as the submitter's phone number"
+msgstr ""
+
+#: includes/view-entry.php:48
+msgid "View Form Submission"
+msgstr ""
+
+#: includes/view-entry.php:111
+msgid "Info"
+msgstr ""
+
+#: includes/view-entry.php:128
+msgid "Submitted"
+msgstr ""
+
+#: includes/view-entry.php:178
+msgid "Anonymous"
+msgstr ""
+
+#: includes/view-entry.php:179
+msgid "no author info"
+msgstr ""
+
+#: includes/view-entry.php:186
+msgid "no email info"
+msgstr ""
+
+#: includes/view-entry.php:193
+msgid "no phone info"
+msgstr ""
+
+#: includes/view-entry.php:217
+msgid "Submission Entry"
+msgstr ""
+
+#: includes/view-entry.php:273
+msgid "No file uploaded"
+msgstr ""
+
+#: includes/view-entry.php:277
+msgid "Accepted"
+msgstr ""
+
+#: includes/view-entry.php:278
+msgid "Not accepted"
+msgstr ""
+
+#: includes/view-entry.php:281
+msgid "No answer"
+msgstr ""
+
+#. translators: %s: comma-separated list of form tag options
+#: includes/view-entry.php:320
+#, php-format
+msgid "Options: %s"
+msgstr ""
+
+#: includes/view-entry.php:335
+msgid "Questions"
+msgstr ""

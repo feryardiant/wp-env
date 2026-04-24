@@ -1,0 +1,30 @@
+{
+    "name": "feryardiant/wp-custom-theme",
+    "homepage": "https://github.com/feryardiant/local-wordpress/",
+    "description": "Custom theme for WordPress local development",
+    "type": "wordpress-theme",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Fery Wardiyanto",
+            "email": "ferywardiyanto@gmail.com"
+        }
+    ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/feryardiant"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {}
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
+}

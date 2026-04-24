@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         cacheDirectory="tests/.cache"
+         executionOrder="depends,defects"
+         beStrictAboutOutputDuringTests="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         colors="true"
+         cacheResult="false">
+    <testsuites>
+        <testsuite name="CF7 Entry Manager">
+            <directory>tests/*/CF7EntryManager</directory>
+        </testsuite>
+
+        <testsuite name="Custom Theme">
+            <directory>tests/*/CustomTheme</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <report>
+            <clover outputFile="tests/coverage/clover.xml"/>
+            <html outputDirectory="tests/coverage" lowUpperBound="50" highLowerBound="90"/>
+        </report>
+    </coverage>
+
+    <source>
+        <include>
+            <directory suffix=".php">packages</directory>
+        </include>
+
+        <exclude>
+            <directory>packages/*/vendor</directory>
+        </exclude>
+    </source>
+
+    <php>
+        <env name="WP_TESTS_SKIP_INSTALL" value="1"/>
+    </php>
+</phpunit>

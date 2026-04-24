@@ -1,0 +1,103 @@
+x-healthcheck: &healthcheck
+  interval: 5s
+  timeout: 5s
+  retries: 3
+
+x-wp-envs: &wp-envs
+  WORDPRESS_DB_HOST: db
+  WORDPRESS_DB_USER: ${DB_USER:-wordpress}
+  WORDPRESS_DB_PASSWORD: ${DB_PASS:-secret}
+  WORDPRESS_DB_NAME: ${DB_NAME:-wordpress}
+  WORDPRESS_DEBUG: ${SITE_DEBUG:-0}
+
+services:
+  wp:
+    image: wordpress:${WP_VERSION:-6.9}-php${PHP_VERSION:-8.4}-apache
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_started
+    ports:
+      - ${FORWARD_WEB_PORT:-8080}:80
+    environment:
+      <<: *wp-envs
+    volumes:
+      - ./docker/volumes/wordpress:/var/www/html
+      - ./packages/cf7-entry-manager:/var/www/html/wp-content/plugins/cf7-entry-manager
+      - ./packages/custom-theme:/var/www/html/wp-content/themes/custom-theme
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      <<: *healthcheck
+
+  cli:
+    image: wordpress:cli-php${PHP_VERSION:-8.4}
+    command: ["/var/www/setup/scripts/init-wp.sh"]
+    depends_on:
+      db:
+        condition: service_healthy
+      wp:
+        condition: service_healthy
+    environment:
+      <<: *wp-envs
+      SITE_URL: ${SITE_URL:-http://localhost:${FORWARD_WEB_PORT:-8080}}
+      SITE_TITLE: ${SITE_TITLE:-}
+      SITE_TIMEZONE: ${SITE_TIMEZONE:-}
+      SITE_ADMIN_USER: ${SITE_ADMIN_USER:-}
+      SITE_ADMIN_PASS: ${SITE_ADMIN_PASS:-}
+      SITE_ADMIN_EMAIL: ${SITE_ADMIN_EMAIL:-}
+      SITE_PLUGINS: ${SITE_PLUGINS:-}
+      SITE_THEMES: ${SITE_THEMES:-}
+      SITE_DEFAULT_THEME: ${SITE_DEFAULT_THEME:-}
+      MULTISITE_ENABLED: ${MULTISITE_ENABLED:-0}
+
+      WC_STORE_ADDRESS: ${WC_STORE_ADDRESS:-}
+      WC_STORE_CITY: ${WC_STORE_CITY:-}
+      WC_DEFAULT_COUNTRY: ${WC_DEFAULT_COUNTRY:-}
+      WC_CURRENCY: ${WC_CURRENCY:-}
+      WC_STORE_POSTCODE: ${WC_STORE_POSTCODE:-}
+      WC_WEIGHT_UNIT: ${WC_WEIGHT_UNIT:-}
+      WC_DIMENSION_UNIT: ${WC_DIMENSION_UNIT:-}
+      WC_PRICE_THOUSAND_SEP: ${WC_PRICE_THOUSAND_SEP:-}
+      WC_PRICE_DECIMAL_SEP: ${WC_PRICE_DECIMAL_SEP:-}
+      WC_PRICE_DECIMAL_NUM: ${WC_PRICE_DECIMAL_NUM:-0}
+
+      ASSET_DIR: /var/www/setup/assets
+      INSTALL_DIR: /var/www/html
+      WP_VERSION: ${WP_VERSION:-6.9}
+    volumes:
+      - ${HOME}/.wp-cli:/home/www-data/.wp-cli
+      - ./assets:/var/www/setup/assets
+      - ./docker/volumes/wordpress:/var/www/html
+      - ./packages/cf7-entry-manager:/var/www/html/wp-content/plugins/cf7-entry-manager:ro
+      - ./packages/custom-theme:/var/www/html/wp-content/themes/custom-theme:ro
+      - ./scripts:/var/www/setup/scripts:ro
+
+  db:
+    image: mysql:8.0
+    ports:
+      - ${FORWARD_DB_PORT:-3306}:3306
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-wordpress}
+      MYSQL_USER: ${DB_USER:-wordpress}
+      MYSQL_PASSWORD: ${DB_PASS:-secret}
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./docker/volumes/mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      <<: *healthcheck
+
+  mail:
+    image: axllent/mailpit:v1.29
+    ports:
+      - ${FORWARD_MAILPIT_PORT:-8025}:8025
+    environment:
+      TZ: ${SITE_TIMEZONE:-"Asia/Jakarta"}
+      MP_DATABASE: /data/mailpit.db
+    volumes:
+      - ./docker/volumes/mailpit:/data
+
+networks:
+  default:
+     name: wordpress

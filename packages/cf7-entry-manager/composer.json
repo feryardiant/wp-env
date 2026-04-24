@@ -1,0 +1,31 @@
+{
+    "name": "feryardiant/cf7-entry-manager",
+    "description": "Never lose a lead again. Save, manage, and convert every Contact Form 7 submission directly in your WordPress dashboard.",
+    "keywords": [ "contact-form-7", "wordpress-plugin", "boilerplate" ],
+    "homepage": "https://github.com/feryardiant/local-wordpress/",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Fery Wardiyanto",
+            "email": "ferywardiyanto@gmail.com"
+        }
+    ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/feryardiant"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {}
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
+}
