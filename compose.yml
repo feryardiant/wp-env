@@ -11,7 +11,7 @@ x-wp-envs: &wp-envs
   WORDPRESS_DEBUG: ${SITE_DEBUG:-0}
 
 services:
-  wp:
+  web:
     image: wordpress:${WP_VERSION:-6.9}-php${PHP_VERSION:-8.4}-apache
     depends_on:
       db:
@@ -35,7 +35,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      wp:
+      web:
         condition: service_healthy
     environment:
       <<: *wp-envs
