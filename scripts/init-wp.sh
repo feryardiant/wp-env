@@ -181,21 +181,6 @@ if _wp plugin is-active woocommerce; then
     e_end
 fi
 
-if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
-    e_start "Set up MultiSite"
-
-    # https://developer.wordpress.org/advanced-administration/server/web-server/httpd/#multisite
-    cat "$ASSET_DIR/.htaccess.multisite" > "$INSTALL_DIR/.htaccess"
-    echo 'Update .htaccess.'
-
-    _wp core multisite-convert
-
-    if ((${#installed_plugins[@]} != 0 )); then
-        _wp plugin activate ${installed_plugins[@]} --network
-    fi
-    e_end
-fi
-
 if [[ -n "${SITE_THEMES:-}" ]]; then
     e_start 'Set up default themes'
     themes=()
@@ -230,6 +215,28 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
     if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
         _wp theme activate $SITE_DEFAULT_THEME
     fi
+    e_end
+fi
+
+if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
+    e_start "Set up MultiSite"
+
+    if _wp core is-installed --network; then
+        echo -e "\e[1;36mNotice:\e[0m Multisite is already installed."
+    else
+        _wp core multisite-convert
+
+        # https://developer.wordpress.org/advanced-administration/server/web-server/httpd/#multisite
+        cat "$ASSET_DIR/.htaccess.multisite" > "$INSTALL_DIR/.htaccess"
+        echo 'Update .htaccess.'
+
+        if ((${#installed_plugins[@]} != 0 )); then
+            _wp plugin activate ${installed_plugins[@]} --network
+        fi
+
+        _wp theme enable $SITE_DEFAULT_THEME --network
+    fi
+
     e_end
 fi
 
