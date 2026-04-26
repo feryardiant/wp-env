@@ -229,11 +229,13 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
         # https://developer.wordpress.org/advanced-administration/server/web-server/httpd/#multisite
         cat "$ASSET_DIR/.htaccess.multisite" > "$INSTALL_DIR/.htaccess"
         echo 'Update .htaccess.'
+    fi
 
-        if ((${#installed_plugins[@]} != 0 )); then
-            _wp plugin activate ${installed_plugins[@]} --network
-        fi
+    if ((${#installed_plugins[@]} != 0 )); then
+        _wp plugin activate ${installed_plugins[@]} --network
+    fi
 
+    if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
         _wp theme enable $SITE_DEFAULT_THEME --network
     fi
 
