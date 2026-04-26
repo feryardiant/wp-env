@@ -41,6 +41,9 @@
     "*.{css,jsonc,ts}": [
       "biome format --write --no-errors-on-unmatched"
     ],
+    "docker/mu-plugins/*.php": [
+      "sh -c 'composer format:packages -- \"$@\"; [ \"$?\" -eq 0 ] || [ \"$?\" -eq 1 ]' --"
+    ],
     "packages/**/*.php": [
       "sh -c 'composer format:packages -- \"$@\"; [ \"$?\" -eq 0 ] || [ \"$?\" -eq 1 ]' --"
     ],
