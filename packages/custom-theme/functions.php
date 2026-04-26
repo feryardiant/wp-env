@@ -47,24 +47,3 @@ add_action(
 	10,
 	0
 );
-
-/**
- * Configure PHPMailer SMTP driver for local development.
- */
-add_action(
-	'phpmailer_init',
-	static function ( WP_PHPMailer $mailer ) {
-		if ( ! function_exists( 'getenv_docker' ) ) {
-			return;
-		}
-
-		// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-		$mailer->Host     = getenv_docker( 'SMTP_HOST', 'mail' );
-		$mailer->Port     = (int) getenv_docker( 'SMTP_PORT', 1025 );
-		$mailer->Username = getenv_docker( 'SMTP_USER', '' );
-		$mailer->Password = getenv_docker( 'SMTP_PASS', '' );
-		// phpcs:enable
-
-		$mailer->isSMTP();
-	}
-);
