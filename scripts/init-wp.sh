@@ -14,11 +14,11 @@ plugins_map['6.1']='2.0.86  0.2.3  5.7.7  12.5.1  7.9.2'
 plugins_map['6.2']='2.0.86  0.2.3  5.8.7  12.7.1  8.2.5'
 plugins_map['6.3']='2.0.86  1.9.0  5.9.8  13.2.1  8.7.3'
 plugins_map['6.4']='2.0.86  1.9.0  5.9.8  13.6.1  9.0.4'
-plugins_map['6.5']='2.1.38  1.9.0  5.9.8  13.9.1  9.4.5'
-plugins_map['6.6']='2.1.38  1.9.0  6.0.6  14.4.1  9.8.7'
-plugins_map['6.7']='2.1.38  1.9.0  6.1.5  15.1.1  10.3.8'
-plugins_map['6.8']='2.1.38  1.9.0  6.1.5  15.7.1  10.6.2'
-plugins_map['6.9']='2.1.38  1.9.0  6.1.5  15.7.1  10.6.2'
+plugins_map['6.5']='2.1.40  1.9.0  5.9.8  13.9.1  9.4.5'
+plugins_map['6.6']='2.1.40  1.9.0  6.0.6  14.4.1  9.8.7'
+plugins_map['6.7']='2.1.40  1.9.0  6.1.5  15.1.1  10.3.8'
+plugins_map['6.8']='2.1.40  1.9.0  6.1.5  15.7.1  10.6.2'
+plugins_map['6.9']='2.1.40  1.9.0  6.1.5  15.7.1  10.6.2'
 
 declare -A themes_map
 
@@ -29,11 +29,11 @@ themes_map['6.1']='2.0.86'
 themes_map['6.2']='2.0.86'
 themes_map['6.3']='2.0.86'
 themes_map['6.4']='2.0.86'
-themes_map['6.5']='2.1.38'
-themes_map['6.6']='2.1.38'
-themes_map['6.7']='2.1.38'
-themes_map['6.8']='2.1.38'
-themes_map['6.9']='2.1.38'
+themes_map['6.5']='2.1.40'
+themes_map['6.6']='2.1.40'
+themes_map['6.7']='2.1.40'
+themes_map['6.8']='2.1.40'
+themes_map['6.9']='2.1.40'
 
 if [[ -f "$PWD/.env" ]]; then
     . "$PWD/.env"
@@ -147,7 +147,7 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
     done
 
     if ((${#plugins[@]} != 0 )); then
-        echo -e "\e[1;36mInfo:\e[0m Installing ${plugins[@]} (latest)"
+        echo -e "\e[1;36mInfo:\e[0m Installing '${plugins[@]}' (latest)"
         _wp plugin install ${plugins[@]} --quiet
 
         installed_plugins+=("${plugins[@]}")
@@ -242,11 +242,22 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
     e_end
 fi
 
-e_start 'Cleanup'
-if _wp plugin is-installed hello; then
-    _wp plugin uninstall hello
+if [[ -n "${TRIM_PLUGINS:-}" ]]; then
+    e_start 'Cleanup'
+    TRIM_PLUGINS=${TRIM_PLUGINS:-''}
+    to_removes=()
+
+    for to_remove in ${TRIM_PLUGINS//,/ }; do
+        if _wp plugin is-installed "$to_remove"; then
+            to_removes+=("$to_remove")
+        fi
+    done
+
+    if ((${#to_removes[@]} != 0 )); then
+        _wp plugin uninstall ${to_removes[@]}
+    fi
+    e_end
 fi
-e_end
 
 e_start 'Verify Installation'
 _wp core version --extra
