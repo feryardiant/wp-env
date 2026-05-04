@@ -15,7 +15,7 @@
     "commit-and-tag-version": "catalog:"
   },
   "commit-and-tag-version": {
-    "config": "../.versionrc.js",
+    "config": "../../scripts/versionrc.theme.js",
     "path": ".",
     "skip": {
       "tag": true
