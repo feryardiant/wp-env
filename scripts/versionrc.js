@@ -6,16 +6,18 @@ const pkgName = basename(cwd)
 
 /**
  * @typedef {Object} PatternPairs
- * @property {String} pattern
- * @property {(String) => String} replace
- *
+ * @property {RegExp} pattern
+ * @property {(version: string) => string} replace
+ */
+
+/**
  * @param {PatternPairs[]} patterns
  * @returns
  */
 const createUpdater = (patterns) => {
   return {
     /**
-     * @param {String} content
+     * @param {string} content
      */
     readVersion: (content) => {
       let result = ''
@@ -33,8 +35,8 @@ const createUpdater = (patterns) => {
     },
 
     /**
-     * @param {String} content
-     * @param {String} version
+     * @param {string} content
+     * @param {string} version
      */
     writeVersion: (content, version) => {
       return patterns.reduce((content, { pattern, replace }) => {
@@ -46,22 +48,21 @@ const createUpdater = (patterns) => {
 
 /**
  * @typedef {Object} BumpFile
- * @property {String} filename
- * @property {typeof updater} updater
+ * @property {string} filename
+ * @property {Object} updater
  *
  * @type {BumpFile[]}
  */
 const files = []
+const basePattern = {
+  pattern: /Version:\s*([\d.]+)/,
+  replace: (version) => `Version: ${version}`,
+}
 
 if (existsSync(`${cwd}/style.css`)) {
   files.push({
     filename: 'style.css',
-    updater: createUpdater([
-      {
-        pattern: /Version:\s*([\d.]+)/,
-        replace: (version) => `Version: ${version}`,
-      },
-    ]),
+    updater: createUpdater([basePattern]),
   })
 }
 
@@ -77,10 +78,7 @@ if (existsSync(`${cwd}/composer.json`)) {
       files.push({
         filename,
         updater: createUpdater([
-          {
-            pattern: /Version:\s*([\d.]+)/,
-            replace: (version) => `Version: ${version}`,
-          },
+          basePattern,
           {
             pattern: new RegExp(`'${key}',\\s'([\\d.]+)'`),
             replace: (version) => `'${key}', '${version}'`,
