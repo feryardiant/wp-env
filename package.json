@@ -45,7 +45,7 @@
     "pre-commit": "bunx lint-staged --allow-empty"
   },
   "lint-staged": {
-    "*.{css,jsonc,ts}": [
+    "*.{css,jsonc,js,ts}": [
       "biome format --write --no-errors-on-unmatched"
     ],
     "docker/mu-plugins/*.php": [

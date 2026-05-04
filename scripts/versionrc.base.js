@@ -9,5 +9,5 @@ export const writerOpts = {
     }
 
     return commit
-  }
-};
+  },
+}

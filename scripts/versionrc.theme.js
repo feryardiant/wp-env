@@ -3,7 +3,7 @@ export * from './versionrc.base.js'
 export const bumpFiles = [
   {
     filename: 'package.json',
-    type: 'json'
+    type: 'json',
   },
   {
     filename: 'style.css',
@@ -23,7 +23,7 @@ export const bumpFiles = [
        */
       writeVersion: (contents, version) => {
         return contents.replace(/Version:\s*[\d.]+/, `Version: ${version}`)
-      }
+      },
     },
-  }
+  },
 ]
