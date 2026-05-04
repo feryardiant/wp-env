@@ -242,11 +242,22 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
     e_end
 fi
 
-e_start 'Cleanup'
-if _wp plugin is-installed hello; then
-    _wp plugin uninstall hello
+if [[ -n "${TRIM_PLUGINS:-}" ]]; then
+    e_start 'Cleanup'
+    TRIM_PLUGINS=${TRIM_PLUGINS:-''}
+    to_removes=()
+
+    for to_remove in ${TRIM_PLUGINS//,/ }; do
+        if _wp plugin is-installed "$to_remove"; then
+            to_removes+=("$to_remove")
+        fi
+    done
+
+    if ((${#to_removes[@]} != 0 )); then
+        _wp plugin uninstall ${to_removes[@]}
+    fi
+    e_end
 fi
-e_end
 
 e_start 'Verify Installation'
 _wp core version --extra
