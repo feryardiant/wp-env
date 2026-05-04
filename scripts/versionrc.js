@@ -14,37 +14,36 @@ const pkgName = basename(cwd)
  * @param {PatternPairs[]} patterns
  * @returns
  */
-const createUpdater = (patterns) => {
-  return {
-    /**
-     * @param {string} content
-     */
-    readVersion: (content) => {
-      let result = ''
+const createUpdater = (patterns) => ({
+  /**
+   * @param {string} content
+   */
+  readVersion: (content) => {
+    let result = ''
 
-      for (const { pattern } of patterns) {
-        const match = content.match(pattern)
+    for (const { pattern } of patterns) {
+      const match = content.match(pattern)
 
-        if (match) {
-          result = match[1]
-          break
-        }
+      if (match?.groups) {
+        result = match.groups.version
+        break
       }
+    }
 
-      return result
-    },
+    return result
+  },
 
-    /**
-     * @param {string} content
-     * @param {string} version
-     */
-    writeVersion: (content, version) => {
-      return patterns.reduce((content, { pattern, replace }) => {
-        return content.replace(pattern, replace(version))
-      }, content)
-    },
-  }
-}
+  /**
+   * @param {string} content
+   * @param {string} version
+   */
+  writeVersion: (content, version) =>
+    patterns.reduce(
+      (content, { pattern, replace }) =>
+        content.replace(pattern, replace(version)),
+      content,
+    ),
+})
 
 /**
  * @typedef {Object} BumpFile
@@ -55,7 +54,7 @@ const createUpdater = (patterns) => {
  */
 const files = []
 const basePattern = {
-  pattern: /Version:\s*([\d.]+)/,
+  pattern: /Version:\s*(?<version>[\d.]+(-\w.*)?)/,
   replace: (version) => `Version: ${version}`,
 }
 
@@ -80,7 +79,7 @@ if (existsSync(`${cwd}/composer.json`)) {
         updater: createUpdater([
           basePattern,
           {
-            pattern: new RegExp(`'${key}',\\s'([\\d.]+)'`),
+            pattern: new RegExp(`'${key}',\\s*'(?<version>[\\d.]+(-\\w.*)?)'`),
             replace: (version) => `'${key}', '${version}'`,
           },
         ]),
