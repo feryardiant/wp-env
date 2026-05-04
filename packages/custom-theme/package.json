@@ -5,6 +5,9 @@
   "private": true,
   "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
   "license": "GPL-3.0-or-later",
+  "repository": {
+    "directory": "packages/custom-theme"
+  },
   "scripts": {
     "release": "commit-and-tag-version"
   },
@@ -12,6 +15,8 @@
     "commit-and-tag-version": "catalog:"
   },
   "commit-and-tag-version": {
+    "config": "../.versionrc.js",
+    "path": ".",
     "skip": {
       "tag": true
     }
