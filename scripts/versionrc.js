@@ -106,7 +106,7 @@ export const writerOpts = {
     const repo = packageData?.repository || {}
 
     if (!repo.directory || commit?.scope !== basename(repo.directory)) {
-      return false
+      return null
     }
 
     return commit
