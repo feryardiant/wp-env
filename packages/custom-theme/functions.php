@@ -7,6 +7,8 @@
  * @license http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License, version 3 or higher
  */
 
+defined( 'CUSTOM_THEME_VERSION' ) || define( 'CUSTOM_THEME_VERSION', '0.0.0' );
+
 add_action(
 	'wp_enqueue_scripts',
 	static function (): void {

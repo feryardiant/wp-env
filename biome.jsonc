@@ -12,6 +12,7 @@
       "!docker/volumes",
       "packages/**/*.css",
       "packages/**/*.ts",
+      "scripts/*.js",
       "**/package.json",
       "**/tsconfig.json"
     ]
