@@ -25,6 +25,11 @@
         "optimize-autoloader": true,
         "allow-plugins": {}
     },
+    "extra": {
+        "version-constants": {
+            "CUSTOM_THEME_VERSION": "functions.php"
+        }
+    },
     "minimum-stability": "beta",
     "prefer-stable": true
 }

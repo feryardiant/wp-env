@@ -15,9 +15,8 @@
     "commit-and-tag-version": "catalog:"
   },
   "commit-and-tag-version": {
-    "config": "../../scripts/versionrc.theme.js",
+    "config": "../../scripts/versionrc.js",
     "path": ".",
-    "releaseCommitMessageFormat": "bump(custom-theme): release v{{currentTag}}",
     "skip": {
       "tag": true
     }
