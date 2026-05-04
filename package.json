@@ -37,7 +37,39 @@
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
-    ]
+    ],
+    "parserPreset": {
+      "name": "conventionalcommits",
+      "presetConfig": {
+        "types": [
+          {
+            "type": "bump",
+            "section": "Releases",
+            "hidden": false
+          }
+        ]
+      }
+    },
+    "rules": {
+      "type-enum": [
+        2,
+        "always",
+        [
+          "build",
+          "bump",
+          "chore",
+          "ci",
+          "docs",
+          "feat",
+          "fix",
+          "perf",
+          "refactor",
+          "revert",
+          "style",
+          "test"
+        ]
+      ]
+    }
   },
   "commit-and-tag-version": {},
   "simple-git-hooks": {
