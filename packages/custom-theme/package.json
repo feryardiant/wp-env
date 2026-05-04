@@ -4,5 +4,16 @@
   "type": "module",
   "private": true,
   "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "release": "commit-and-tag-version"
+  },
+  "devDependencies": {
+    "commit-and-tag-version": "catalog:"
+  },
+  "commit-and-tag-version": {
+    "skip": {
+      "tag": true
+    }
+  }
 }
