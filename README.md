@@ -27,6 +27,8 @@ The environment uses a custom `init-wp.sh` engine to handle everything:
 - Database creation and site installation.
 - Admin user creation and plugin/theme activation.
 - WooCommerce and Multisite configuration.
+- **Plugin Cleanup**: Use `TRIM_PLUGINS` in `.env` to surgically remove default or unwanted plugins during setup.
+- **Must-Use Plugins**: Support for `mu-plugins` via the `docker/mu-plugins` directory.
 
 ### 🛍️ WooCommerce Integration
 If `woocommerce` is in `SITE_PLUGINS`, the store is automatically configured:
@@ -60,7 +62,10 @@ SITE_PLUGINS=akismet,woocommerce,contact-form-7
 
 ## 🏗️ Project Architecture
 
-This project is organized as a **monorepo** to simplify the development of multiple WordPress assets simultaneously.
+This project is organized as a **monorepo** and uses a modular Docker configuration to simplify the development of multiple WordPress assets simultaneously.
+
+### 🐳 Docker Configuration
+The environment uses a base configuration in `docker/compose.base.yml` which is extended by the root `compose.yml`. This separation allows for a clean, reusable base image and service definitions while keeping local development overrides isolated.
 
 ### 📂 Directory Structure
 - [`assets/`](assets/): Static assets, favicon, and server configurations.
