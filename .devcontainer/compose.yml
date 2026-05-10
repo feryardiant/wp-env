@@ -1,0 +1,46 @@
+services:
+  web:
+    extends:
+      file: ../docker/compose.base.yml
+      service: web
+    env_file:
+      - path: ../.env.devcontainer
+        required: false
+    ports:
+      - ${DEVCONTAINER_WEB_PORT:-8080}:80
+    volumes:
+      - ../packages/custom-theme:/var/www/html/wp-content/themes/custom-theme
+
+  cli:
+    extends:
+      file: ../docker/compose.base.yml
+      service: cli
+    env_file:
+      - path: ../.env.devcontainer
+        required: false
+    volumes:
+      - ../packages/custom-theme:/var/www/html/wp-content/themes/custom-theme:ro
+
+  db:
+    extends:
+      file: ../docker/compose.base.yml
+      service: db
+    env_file:
+      - path: ../.env.devcontainer
+        required: false
+    ports:
+      - ${DEVCONTAINER_DB_PORT:-3306}:3306
+
+  mail:
+    extends:
+      file: ../docker/compose.base.yml
+      service: mail
+    env_file:
+      - path: ../.env.devcontainer
+        required: false
+    ports:
+      - ${DEVCONTAINER_MAILPIT_PORT:-8025}:8025
+
+networks:
+  default:
+     name: wp-env-devcontainer

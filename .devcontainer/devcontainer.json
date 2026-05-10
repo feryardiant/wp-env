@@ -1,0 +1,24 @@
+{
+  "name": "WordPress Env",
+  "dockerComposeFile": "./compose.yml",
+  "service": "web",
+  "workspaceFolder": "/var/www/html",
+  "mounts": [
+    {
+      "type": "bind",
+      "source": "../packages/custom-theme",
+      "target": "/var/www/html/wp-content/themes/custom-theme"
+    }
+  ],
+  "containerEnv": {
+    "SITE_URL": "${localEnv:SITE_URL}",
+    "SITE_TITLE": "${localEnv:SITE_TITLE}",
+    "SITE_DEBUG": "${localEnv:SITE_DEBUG}"
+  },
+  "customizations": {},
+  "runServices": [
+    "cli",
+    "db",
+    "mail"
+  ]
+}
