@@ -23,6 +23,6 @@ A Dockerized WordPress local development environment using Apache, MySQL 8.0, an
 
 ## 📝 Persistent Memory (Context)
 
-- **Date**: 2026-04-23
-- **Status**: Environment is fully documented. Test architecture has been updated to use `camelCase` naming conventions and strict docblock standards (including `@return void`).
+- **Date**: 2026-05-10
+- **Status**: Environment infrastructure refactored to use service inheritance and YAML anchors. Documentation updated to reflect the `web` service and improved package mounting workflow.
 - **Next Steps**: Continue maintaining strict PSR-12 and WordPress coding standards across all packages and tests.
