@@ -1,3 +1,6 @@
+x-packages: &packages
+  - ./packages/custom-theme:/var/www/html/wp-content/themes/custom-theme
+
 services:
   web:
     extends:
@@ -5,15 +8,13 @@ services:
       service: web
     ports:
       - ${FORWARD_WEB_PORT:-8080}:80
-    volumes:
-      - ./packages/custom-theme:/var/www/html/wp-content/themes/custom-theme
+    volumes: *packages
 
   cli:
     extends:
       file: docker/compose.base.yml
       service: cli
-    volumes:
-      - ./packages/custom-theme:/var/www/html/wp-content/themes/custom-theme:ro
+    volumes: *packages
 
   db:
     extends:
