@@ -8,7 +8,7 @@ A Dockerized WordPress local development environment using Apache, MySQL 8.0, an
 
 ## 🛠 Operational Mandates
 
-1.  **Environment Variables**: The project is strictly dependent on a `.env` file. NEVER hardcode values in `compose.yaml`. Verify required variables (see `README.md`) before proposing changes.
+1.  **Environment Variables**: The project is strictly dependent on a `.env` file. NEVER hardcode values in `compose.yml`. Verify required variables (see `README.md`) before proposing changes.
 2.  **Service Lifecycle**: Always use `docker compose` for starting/stopping services.
 3.  **WP-CLI Management**: Use the dedicated `cli` service for all WordPress commands.
     *   Command pattern: `docker compose run --rm cli wp <command>`
@@ -18,7 +18,8 @@ A Dockerized WordPress local development environment using Apache, MySQL 8.0, an
 ## 📁 Development Guidelines
 
 1.  **Themes/Plugins**: Prefer creating custom themes/plugins in `packages/` and symlinking them or mounting them into `docker/volumes/wordpress/wp-content/` if intended for portability.
-2.  **Initialization**: Changes to site titles, admin users, or pre-installed plugins should be implemented in `docker/init-wp.sh`.
+2.  **Initialization**: Changes to site titles, admin users, or pre-installed plugins should be implemented in `scripts/init-wp.sh`.
+3.  **Package Mounting**: When adding new themes or plugins, update the `x-packages` YAML anchor in `compose.yml` instead of adding manual volume mounts to individual services.
 
 ## 📝 Persistent Memory (Context)
 
