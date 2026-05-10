@@ -27,6 +27,8 @@ The environment uses a custom `init-wp.sh` engine to handle everything:
 - Database creation and site installation.
 - Admin user creation and plugin/theme activation.
 - WooCommerce and Multisite configuration.
+- **Plugin Cleanup**: Use `TRIM_PLUGINS` in `.env` to surgically remove default or unwanted plugins during setup.
+- **Must-Use Plugins**: Support for `mu-plugins` via the `docker/mu-plugins` directory.
 
 ### 🛍️ WooCommerce Integration
 If `woocommerce` is in `SITE_PLUGINS`, the store is automatically configured:
@@ -48,7 +50,7 @@ Place your theme or plugin folder in the [`packages/`](packages/) directory. The
 
 #### 🏗️ Adding a New Package
 1. **Create Directory**: `mkdir packages/my-new-plugin`
-2. **Mount Volume**: Add the new path to `compose.yml` under both `wp` and `cli` services.
+2. **Mount Volume**: Update the `x-packages` anchor at the top of [`compose.yml`](compose.yml). This automatically syncs the volume across both `web` and `cli` services.
 3. **Register PHP Dependencies**: Ensure the package has a `composer.json`. Run `composer install` at the project root to merge its dependencies.
 4. **Register Assets**: Ensure the package has a `package.json`. Run `bun install` at the root to register its workspace.
 
@@ -60,7 +62,10 @@ SITE_PLUGINS=akismet,woocommerce,contact-form-7
 
 ## 🏗️ Project Architecture
 
-This project is organized as a **monorepo** to simplify the development of multiple WordPress assets simultaneously.
+This project is organized as a **monorepo** and uses a modular Docker configuration to simplify the development of multiple WordPress assets simultaneously.
+
+### 🐳 Docker Configuration
+The environment uses a base configuration in `docker/compose.base.yml` which is extended by the root `compose.yml`. This separation allows for a clean, reusable base image and service definitions while keeping local development overrides isolated.
 
 ### 📂 Directory Structure
 - [`assets/`](assets/): Static assets, favicon, and server configurations.
