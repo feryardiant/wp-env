@@ -50,7 +50,7 @@ Place your theme or plugin folder in the [`packages/`](packages/) directory. The
 
 #### 🏗️ Adding a New Package
 1. **Create Directory**: `mkdir packages/my-new-plugin`
-2. **Mount Volume**: Update the `x-packages` anchor at the top of `compose.yml`. This automatically syncs the volume across both `web` and `cli` services.
+2. **Mount Volume**: Update the `x-packages` anchor at the top of [`compose.yml`](compose.yml). This automatically syncs the volume across both `web` and `cli` services.
 3. **Register PHP Dependencies**: Ensure the package has a `composer.json`. Run `composer install` at the project root to merge its dependencies.
 4. **Register Assets**: Ensure the package has a `package.json`. Run `bun install` at the root to register its workspace.
 
