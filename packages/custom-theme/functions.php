@@ -12,11 +12,11 @@ defined( 'CUSTOM_THEME_VERSION' ) || define( 'CUSTOM_THEME_VERSION', '0.0.1' );
 add_action(
 	'wp_enqueue_scripts',
 	static function (): void {
-		$theme = wp_get_theme( get_stylesheet() );
+		$theme = wp_get_theme();
 
 		wp_register_script(
 			$theme->stylesheet,
-			get_stylesheet_directory_uri() . '/assets/custom.js',
+			$theme->get_stylesheet_directory_uri() . '/assets/custom.js',
 			array(),
 			$theme->version,
 			array( 'strategy' => 'defer' )
