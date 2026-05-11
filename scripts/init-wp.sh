@@ -106,14 +106,20 @@ else
         --skip-email --allow-root
     e_end
 
-    e_start 'Set up default options'
-    _wp option update permalink_structure "/%postname%/"
-    _wp option update timezone_string "${SITE_TIMEZONE:-Asia/Jakarta}"
-    e_end
-
+    e_start 'Set up media'
     if [[ ! -f "$INSTALL_DIR/favicon.ico" ]]; then
         cp "$ASSET_DIR/favicon.ico" "$INSTALL_DIR/favicon.ico"
     fi
+
+                     # Post ID   4              5         6        7
+    _wp media import $ASSET_DIR/{WordPress-Logo,Acme-Logo,No-Image,Image-Placeholder}.png
+    e_end
+
+    e_start 'Set up default options'
+    _wp option update permalink_structure "/%postname%/"
+    _wp option update timezone_string "${SITE_TIMEZONE:-Asia/Jakarta}"
+    _wp option update site_icon "4" # The 'WordPress-Logo.png'
+    e_end
 fi
 
 installed_plugins=()
