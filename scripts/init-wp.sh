@@ -222,7 +222,8 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
         fi
 
         if [[ -n "$theme_version" ]]; then
-            _wp theme install "$theme" --version=$theme_version
+            result=$(_wp theme install "$theme" --version="$theme_version" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
 
             continue
         fi
@@ -230,8 +231,13 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
         themes+=("$theme")
     done
 
+    unset theme result
+
     if ((${#themes[@]} != 0 )); then
-        _wp theme install ${themes[@]}
+        for theme in "${themes[@]}"; do
+            result=$(_wp theme install "$theme" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
+        done
     fi
 
     SITE_DEFAULT_THEME=${SITE_DEFAULT_THEME:-}
