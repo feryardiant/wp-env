@@ -358,7 +358,7 @@ for site_url in $site_urls; do
         for key in "${!woo_options[@]}"; do
             format=$([[ "${woo_options[$key]}" == '['*']' ]] && echo 'json' || echo 'plaintext')
 
-            _wp --url="$site_url" option update "woocommerce_$key" "${woo_options[$key]}" --format=$format
+            _wp --url="$site_url" option update "woocommerce_$key" "${woo_options[$key]}" --format="$format"
         done
 
         # Skip the onboarding profile
