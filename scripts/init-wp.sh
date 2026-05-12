@@ -224,7 +224,7 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
 
         theme_version="${theme_supports[$theme]:-}"
         if [[ "$theme_version" == "none" ]]; then
-            echo -e "\e[1;36mNotice:\e[0m Skipping '$plugin' - incompatible with WordPress ${WP_VERSION}"
+            echo -e "\e[1;36mNotice:\e[0m Skipping '$theme' - incompatible with WordPress ${WP_VERSION}"
 
             continue
         fi
