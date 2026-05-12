@@ -155,6 +155,19 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
         plugins+=("$plugin")
     done
 
+    unset plugin result
+
+    if [[ -f "$SCRIPTS_DIR/setup-plugins.txt" ]]; then
+        while read plugin; do
+            if [[ -n $plugin ]] && ! _wp plugin is-installed "$plugin"; then
+                result=$(_wp plugin install "$plugin" | head -n 1)
+                echo -e "\e[1;36mInfo:\e[0m $result"
+            fi
+        done < "$SCRIPTS_DIR/setup-plugins.txt"
+
+        unset plugin result
+    fi
+
     if ((${#plugins[@]} != 0 )); then
         for plugin in "${plugins[@]}"; do
             result=$(_wp plugin install "$plugin" | head -n 1)

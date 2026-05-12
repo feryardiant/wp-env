@@ -48,6 +48,9 @@ node_modules
 coverage
 *.lcov
 
+# Additional plugins and themes
+scripts/setup-*.txt
+
 # Other package managers
 packages/*/composer.lock
 yarn.lock
