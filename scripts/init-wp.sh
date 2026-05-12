@@ -117,7 +117,7 @@ else
     _wp media import $ASSET_DIR/{WordPress-Logo,Acme-Logo,No-Image,Image-Placeholder}.png
     e_end
 
-    e_start 'Set up default options'
+    e_start 'Set up options'
     _wp option update permalink_structure "/%postname%/"
     _wp option update timezone_string "${SITE_TIMEZONE:-Asia/Jakarta}"
     _wp option update site_icon "4" # The 'WordPress-Logo.png'
@@ -127,7 +127,7 @@ fi
 plugins_to_activate=()
 
 if [[ -n "${SITE_PLUGINS:-}" ]]; then
-    e_start 'Set up default Plugins'
+    e_start 'Set up plugins'
     SITE_PLUGINS=${SITE_PLUGINS:-''}
     plugins=()
 
@@ -175,6 +175,8 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
         done
 
         plugins_to_activate+=("${plugins[@]}")
+
+        unset plugin result
     fi
 
     if ((${#plugins_to_activate[@]} != 0 )); then
@@ -206,7 +208,7 @@ if _wp plugin is-active woocommerce; then
 fi
 
 if [[ -n "${SITE_THEMES:-}" ]]; then
-    e_start 'Set up default themes'
+    e_start 'Set up themes'
     themes=()
 
     for theme in ${SITE_THEMES//,/ }; do
@@ -249,6 +251,8 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
             result=$(_wp theme install "$theme" | head -n 1)
             echo -e "\e[1;36mInfo:\e[0m $result"
         done
+
+        unset theme result
     fi
 
     SITE_DEFAULT_THEME=${SITE_DEFAULT_THEME:-}
@@ -260,7 +264,7 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
 fi
 
 if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
-    e_start "Set up MultiSite"
+    e_start "Set up multiSite"
 
     if _wp core is-installed --network; then
         echo -e "\e[1;36mNotice:\e[0m Multisite is already installed."
@@ -300,7 +304,7 @@ if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     e_end
 fi
 
-e_start 'Verify Installation'
+e_start 'Verify installation'
 _wp core version --extra
 echo "Site URL: ${SITE_URL}"
 e_end
