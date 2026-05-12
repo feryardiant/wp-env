@@ -75,6 +75,7 @@ if [[ ! -d "${ASSET_DIR}" ]]; then
 fi
 
 SITE_URL=${SITE_URL:-'http://localhost'}
+SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
 SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
 icon_id=0
 
@@ -104,7 +105,7 @@ else
     e_start 'Install WordPress Core'
     _wp core install \
         --url="${SITE_URL}" --title="${SITE_TITLE:-'WordPress Local'}" \
-        --admin_user=${SITE_ADMIN_USER:-admin} \
+        --admin_user=${SITE_ADMIN_USER} \
         --admin_password=${SITE_ADMIN_PASS:-secret} \
         --admin_email=${SITE_ADMIN_EMAIL:-'admin@example.com'} \
         --skip-email --allow-root
@@ -192,30 +193,6 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
     e_end
 fi
 
-if _wp plugin is-active woocommerce; then
-    e_start "Set up WooCommerce"
-
-    _wp option update woocommerce_store_address "${WC_STORE_ADDRESS:-'Jl. Example No. 123'}"
-    _wp option update woocommerce_store_city "${WC_STORE_CITY:-'Batang'}"
-    _wp option update woocommerce_default_country "${WC_DEFAULT_COUNTRY:-'ID:JT'}"
-    _wp option update woocommerce_currency "${WC_CURRENCY:-'IDR'}"
-    _wp option update woocommerce_store_postcode "${WC_STORE_POSTCODE:-'12345'}"
-
-    _wp option update woocommerce_weight_unit "${WC_WEIGHT_UNIT:-kg}"
-    _wp option update woocommerce_dimension_unit "${WC_DIMENSION_UNIT:-cm}"
-    _wp option update woocommerce_price_thousand_sep "${WC_PRICE_THOUSAND_SEP:-.}"
-    _wp option update woocommerce_price_decimal_sep "${WC_PRICE_DECIMAL_SEP:-,}"
-    _wp option update woocommerce_price_num_decimals "${WC_PRICE_DECIMAL_NUM:-0}"
-
-    # Skip the onboarding profile
-    _wp option update woocommerce_onboarding_profile '{"skipped":true}' --format=json
-
-    # Mark the task list as complete
-    _wp option update woocommerce_task_list_complete yes
-
-    e_end
-fi
-
 if [[ -n "${SITE_THEMES:-}" ]]; then
     e_start 'Set up themes'
 
@@ -299,7 +276,6 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
     e_end
 fi
 
-e_start 'Set up options'
 declare -A options
 
 options['permalink_structure']='/%postname%/'
@@ -317,20 +293,67 @@ options['large_size_w']='1080'
 options['large_size_h']='1080'
 options['blog_upload_space']='50'
 
-for key in "${!options[@]}"; do
-    if ! _wp core is-installed --network; then
-        _wp option update "$key" "${options[$key]}"
+declare -A woo_options
 
-        continue
-    fi
+woo_options['store_address']=${WC_STORE_ADDRESS:-Jl. Example No. 123}
+woo_options['store_city']=${WC_STORE_CITY:-Batang}
+woo_options['default_country']=${WC_DEFAULT_COUNTRY:-ID:JT}
+woo_options['currency']=${WC_CURRENCY:-IDR}
+woo_options['currency_pos']=${WC_CURRENCY_POS:-left_space}
+woo_options['store_postcode']=${WC_STORE_POSTCODE:-12345}
 
-    for site_url in $(_wp site list --field=url); do
+woo_options['allowed_countries']=${WC_ALLOWED_COUNTRIES:-specific}
+woo_options['all_except_countries']=${WC_ALL_EXCEPT_COUNTRIES:-'[]'}
+woo_options['specific_allowed_countries']=${WC_SPECIFIC_ALLOWED_COUNTRIES:-'["ID"]'}
+woo_options['ship_to_countries']=${WC_SHIP_TO_COUNTRIES:-specific}
+woo_options['specific_ship_to_countries']=${WC_SPECIFIC_SHIP_TO_COUNTRIES:-'["ID"]'}
+
+woo_options['weight_unit']=${WC_WEIGHT_UNIT:-kg}
+woo_options['dimension_unit']=${WC_DIMENSION_UNIT:-cm}
+woo_options['price_thousand_sep']=${WC_PRICE_THOUSAND_SEP:-.}
+woo_options['price_decimal_sep']=${WC_PRICE_DECIMAL_SEP:-,}
+woo_options['price_num_decimals']=${WC_PRICE_DECIMAL_NUM:-0}
+
+if _wp core is-installed --network; then
+    site_urls=$(_wp site list --field=url)
+else
+    site_urls="$SITE_URL"
+fi
+
+for site_url in $site_urls; do
+    site_title=$(_wp --url="$site_url" option get blogname)
+
+    e_start "Set up options: $site_title"
+
+    for key in "${!options[@]}"; do
         _wp --url="$site_url" option update "$key" "${options[$key]}"
     done
+
+    if _wp --url="$site_url" plugin is-active woocommerce; then
+        for key in "${!woo_options[@]}"; do
+            format=$([[ "${woo_options[$key]}" == '['*']' ]] && echo 'json' || echo 'plaintext')
+
+            _wp --url="$site_url" option update "woocommerce_$key" "${woo_options[$key]}" --format=$format
+        done
+
+        # Skip the onboarding profile
+        timestamp="{\"completed_at\":\"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"}"
+        _wp --url="$site_url" option update woocommerce_onboarding_profile '{"skipped":true}' --format=json
+        _wp --url="$site_url" option update woocommerce_onboarding_profile_progress \
+            "{\"core_profiler_completed_steps\":{\"intro-opt-in\":${timestamp},\"skip-guided-setup\":${timestamp}}}" --format=json
+        unset timestamp
+
+        # Install default woocommerce pages
+        _wp --url="$site_url" wc --user="$SITE_ADMIN_USER" tool run install_pages
+
+    fi
+
+    unset key
+
+    e_end
 done
 
-unset options
-e_end
+unset options woo_options site_url site_urls
 
 if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     e_start 'Cleanup'
