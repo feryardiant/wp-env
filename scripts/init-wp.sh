@@ -75,6 +75,8 @@ if [[ ! -d "${ASSET_DIR}" ]]; then
 fi
 
 SITE_URL=${SITE_URL:-'http://localhost'}
+SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
+icon_id=0
 
 if [[ ${WP_RESET:-0} -eq 1 ]]; then
     e_start "Reset WordPress Core"
@@ -113,15 +115,19 @@ else
         cp "$ASSET_DIR/favicon.ico" "$INSTALL_DIR/favicon.ico"
     fi
 
-    # ---------------- Post ID   4              5         6        7
-    _wp media import $ASSET_DIR/{WordPress-Logo,Acme-Logo,No-Image,Image-Placeholder}.png
-    e_end
+    for img in "$ASSET_DIR"/*.png; do
+        filename=$(basename "$img")
 
-    e_start 'Set up options'
-    _wp option update permalink_structure "/%postname%/"
-    _wp option update timezone_string "${SITE_TIMEZONE:-Asia/Jakarta}"
-    _wp option update site_icon "4" # The 'WordPress-Logo.png'
-    e_end
+        img_id=$(_wp media import $img --porcelain)
+
+        if [[ "$filename" == "$SITE_ICON_FILENAME" ]]; then
+            icon_id=$img_id
+        fi
+
+        echo -e "\e[1;36mInfo:\e[0m '$filename' imported (ID: $img_id)"
+    done
+
+   e_end
 fi
 
 plugins_to_activate=()
@@ -292,6 +298,39 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
 
     e_end
 fi
+
+e_start 'Set up options'
+declare -A options
+
+options['permalink_structure']='/%postname%/'
+options['timezone_string']="${SITE_TIMEZONE:-Asia/Jakarta}"
+
+if [[ $icon_id -gt 0 ]]; then
+    options['site_icon']=$icon_id
+fi
+
+options['thumbnail_size_w']='300'
+options['thumbnail_size_h']='300'
+options['medium_size_w']='500'
+options['medium_size_h']='500'
+options['large_size_w']='1080'
+options['large_size_h']='1080'
+options['blog_upload_space']='50'
+
+for key in "${!options[@]}"; do
+    if ! _wp core is-installed --network; then
+        _wp option update "$key" "${options[$key]}"
+
+        continue
+    fi
+
+    for site_url in $(_wp site list --field=url); do
+        _wp --url="$site_url" option update "$key" "${options[$key]}"
+    done
+done
+
+unset options
+e_end
 
 if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     e_start 'Cleanup'
