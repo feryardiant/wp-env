@@ -124,7 +124,7 @@ else
     e_end
 fi
 
-installed_plugins=()
+plugins_to_activate=()
 
 if [[ -n "${SITE_PLUGINS:-}" ]]; then
     e_start 'Set up default Plugins'
@@ -144,9 +144,10 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
         fi
 
         if [[ -n "$plugin_version" ]]; then
-            echo -e "\e[1;36mInfo:\e[0m Installing '$plugin' (v$plugin_version)"
-            _wp plugin install "$plugin" --version="$plugin_version" --quiet
-            installed_plugins+=("$plugin")
+            result=$(_wp plugin install "$plugin" --version="$plugin_version" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
+
+            plugins_to_activate+=("$plugin")
 
             continue
         fi
@@ -155,14 +156,16 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
     done
 
     if ((${#plugins[@]} != 0 )); then
-        echo -e "\e[1;36mInfo:\e[0m Installing '${plugins[@]}' (latest)"
-        _wp plugin install ${plugins[@]} --quiet
+        for plugin in "${plugins[@]}"; do
+            result=$(_wp plugin install "$plugin" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
+        done
 
-        installed_plugins+=("${plugins[@]}")
+        plugins_to_activate+=("${plugins[@]}")
     fi
 
-    if ((${#installed_plugins[@]} != 0 )); then
-        _wp plugin activate ${installed_plugins[@]}
+    if ((${#plugins_to_activate[@]} != 0 )); then
+        _wp plugin activate ${plugins_to_activate[@]}
     fi
     e_end
 fi
@@ -239,8 +242,8 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
         echo 'Update .htaccess.'
     fi
 
-    if ((${#installed_plugins[@]} != 0 )); then
-        _wp plugin activate ${installed_plugins[@]} --network
+    if ((${#plugins_to_activate[@]} != 0 )); then
+        _wp plugin activate ${plugins_to_activate[@]} --network
     fi
 
     if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
