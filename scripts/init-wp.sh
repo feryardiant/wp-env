@@ -4,10 +4,14 @@ set -euo pipefail
 
 . "$(dirname "$0")/_util.sh"
 
+# ==============================================================================
+# Configurations
+# ==============================================================================
+
 declare -A plugins_map
 
-                  # Blocksy Plugin Contact        Woo
-                  # Comp.   Check  Form7  JetPack Comm.
+# ----------------- Blocksy Plugin Contact        Woo
+# ----------------- Comp.   Check  Form7  JetPack Comm.
 plugins_map['5.9']='2.0.86  0.2.0  5.7.7  11.2.2  7.5.2'
 plugins_map['6.0']='2.0.86  0.2.3  5.7.7  12.0.1  7.7.3'
 plugins_map['6.1']='2.0.86  0.2.3  5.7.7  12.5.1  7.9.2'
@@ -20,9 +24,11 @@ plugins_map['6.7']='2.1.41  1.9.0  6.1.5  15.1.1  10.3.8'
 plugins_map['6.8']='2.1.41  1.9.0  6.1.5  15.7.1  10.7.0'
 plugins_map['6.9']='2.1.41  1.9.0  6.1.5  15.7.1  10.7.0'
 
+# ==============================================================================
+
 declare -A themes_map
 
-                 # Blocksy
+# ---------------- Blocksy
 themes_map['5.9']='2.0.86'
 themes_map['6.0']='2.0.86'
 themes_map['6.1']='2.0.86'
@@ -34,6 +40,8 @@ themes_map['6.6']='2.1.41'
 themes_map['6.7']='2.1.41'
 themes_map['6.8']='2.1.41'
 themes_map['6.9']='2.1.41'
+
+# ==============================================================================
 
 if [[ -f "$PWD/.env" ]]; then
     . "$PWD/.env"
@@ -51,6 +59,8 @@ if ((${#wp_themes[@]} == 0 )); then
     exit 1
 fi
 
+# ==============================================================================
+
 declare -A plugin_supports
 
 plugin_supports['blocksy-companion']="${wp_plugins[0]:-2.0.86}"
@@ -59,9 +69,13 @@ plugin_supports['contact-form-7']="${wp_plugins[2]:-5.7.7}"
 plugin_supports['jetpack']="${wp_plugins[3]:-11.2.2}"
 plugin_supports['woocommerce']="${wp_plugins[4]:-7.5.2}"
 
+# ==============================================================================
+
 declare -A theme_supports
 
 theme_supports['blocksy']="${wp_themes[0]:-2.0.86}"
+
+# ==============================================================================
 
 declare -A options
 
@@ -74,6 +88,8 @@ options['medium_size_h']='500'
 options['large_size_w']='1080'
 options['large_size_h']='1080'
 options['blog_upload_space']='50'
+
+# ==============================================================================
 
 declare -A woo_options
 
@@ -96,10 +112,16 @@ woo_options['price_thousand_sep']=${WC_PRICE_THOUSAND_SEP:-.}
 woo_options['price_decimal_sep']=${WC_PRICE_DECIMAL_SEP:-,}
 woo_options['price_num_decimals']=${WC_PRICE_DECIMAL_NUM:-0}
 
+# ==============================================================================
+
 SETUP_DIR=${SETUP_DIR:-"$PWD"}
 ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
 SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
 INSTALL_DIR=${INSTALL_DIR:-"$PWD/docker/volumes/wordpress"}
+
+SITE_URL=${SITE_URL:-'http://localhost'}
+SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
+SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
 
 if [[ ! -d "${ASSET_DIR}" ]]; then
     echo -e "\e[1;31mError:\e[0m Unable to continue installation."
@@ -107,9 +129,9 @@ if [[ ! -d "${ASSET_DIR}" ]]; then
     exit 1
 fi
 
-SITE_URL=${SITE_URL:-'http://localhost'}
-SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
-SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
+# ==============================================================================
+# Executions
+# ==============================================================================
 
 if [[ ${WP_RESET:-0} -eq 1 ]]; then
     e_start "Reset WordPress Core"
@@ -162,6 +184,8 @@ else
 
    e_end
 fi
+
+# ==============================================================================
 
 plugins_to_activate=()
 
@@ -225,6 +249,8 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
     e_end
 fi
 
+# ==============================================================================
+
 if [[ -n "${SITE_THEMES:-}" ]]; then
     e_start 'Set up themes'
 
@@ -284,6 +310,8 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
     e_end
 fi
 
+# ==============================================================================
+
 if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
     e_start "Set up multisite"
 
@@ -307,6 +335,8 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
 
     e_end
 fi
+
+# ==============================================================================
 
 if _wp core is-installed --network; then
     site_urls=$(_wp site list --field=url)
@@ -349,6 +379,8 @@ done
 
 unset options woo_options site_url site_urls
 
+# ==============================================================================
+
 if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     e_start 'Cleanup'
 
@@ -367,6 +399,8 @@ if [[ -n "${TRIM_PLUGINS:-}" ]]; then
 
     e_end
 fi
+
+# ==============================================================================
 
 e_start 'Verify installation'
 _wp core version --extra
