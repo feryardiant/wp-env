@@ -18,7 +18,7 @@ A Dockerized WordPress local development environment using Apache, MySQL 8.0, an
 ## 📁 Development Guidelines
 
 1.  **Themes/Plugins**: Prefer creating custom themes/plugins in `packages/` and symlinking them or mounting them into `docker/volumes/wordpress/wp-content/` if intended for portability.
-2.  **Initialization**: Changes to site titles, admin users, or pre-installed plugins should be implemented in `scripts/init-wp.sh`.
+2.  **Initialization**: Changes to site titles, admin users, or pre-installed plugins should be implemented in `scripts/init-wp.sh`. Additional plugins and themes can also be listed in `scripts/init-plugins.txt` and `scripts/init-themes.txt` for bulk installation during setup.
 3.  **Package Mounting**: When adding new themes or plugins, update the `x-packages` YAML anchor in `compose.yml` instead of adding manual volume mounts to individual services.
 
 ## 📝 Persistent Memory (Context)

@@ -29,6 +29,7 @@ The environment uses a custom `init-wp.sh` engine to handle everything:
 - WooCommerce and Multisite configuration.
 - **Plugin Cleanup**: Use `TRIM_PLUGINS` in `.env` to surgically remove default or unwanted plugins during setup.
 - **Must-Use Plugins**: Support for `mu-plugins` via the `docker/mu-plugins` directory.
+- **Bulk Installation**: Support for installing multiple plugins and themes via `scripts/init-plugins.txt` and `scripts/init-themes.txt`.
 
 ### 🛍️ WooCommerce Integration
 If `woocommerce` is in `SITE_PLUGINS`, the store is automatically configured:
@@ -59,6 +60,8 @@ Add slugs to `SITE_PLUGINS` or `SITE_THEMES` in your `.env`:
 ```bash
 SITE_PLUGINS=akismet,woocommerce,contact-form-7
 ```
+
+> **Note:** For bulk installation, you can also list slugs (one per line) in `scripts/init-plugins.txt` or `scripts/init-themes.txt`.
 
 ## 🏗️ Project Architecture
 
