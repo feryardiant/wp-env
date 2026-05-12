@@ -63,7 +63,9 @@ declare -A theme_supports
 
 theme_supports['blocksy']="${wp_themes[0]:-2.0.86}"
 
-ASSET_DIR=${ASSET_DIR:-"$PWD/assets"}
+SETUP_DIR=${SETUP_DIR:-"$PWD"}
+ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
+SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
 INSTALL_DIR=${INSTALL_DIR:-"$PWD/docker/volumes/wordpress"}
 
 if [[ ! -d "${ASSET_DIR}" ]]; then
@@ -111,40 +113,44 @@ else
         cp "$ASSET_DIR/favicon.ico" "$INSTALL_DIR/favicon.ico"
     fi
 
-                     # Post ID   4              5         6        7
+    # ---------------- Post ID   4              5         6        7
     _wp media import $ASSET_DIR/{WordPress-Logo,Acme-Logo,No-Image,Image-Placeholder}.png
     e_end
 
-    e_start 'Set up default options'
+    e_start 'Set up options'
     _wp option update permalink_structure "/%postname%/"
     _wp option update timezone_string "${SITE_TIMEZONE:-Asia/Jakarta}"
     _wp option update site_icon "4" # The 'WordPress-Logo.png'
     e_end
 fi
 
-installed_plugins=()
+plugins_to_activate=()
 
 if [[ -n "${SITE_PLUGINS:-}" ]]; then
-    e_start 'Set up default Plugins'
+    e_start 'Set up plugins'
+
     SITE_PLUGINS=${SITE_PLUGINS:-''}
     plugins=()
 
     for plugin in ${SITE_PLUGINS//,/ }; do
         if _wp plugin is-installed "$plugin"; then
             echo -e "\e[1;36mNotice:\e[0m '$plugin' is already installed."
+
             continue
         fi
 
         plugin_version="${plugin_supports[$plugin]:-}"
         if [[ "$plugin_version" == "none" ]]; then
             echo -e "\e[1;36mNotice:\e[0m Skipping '$plugin' - incompatible with WordPress ${WP_VERSION}"
+
             continue
         fi
 
+        plugins_to_activate+=("$plugin")
+
         if [[ -n "$plugin_version" ]]; then
-            echo -e "\e[1;36mInfo:\e[0m Installing '$plugin' (v$plugin_version)"
-            _wp plugin install "$plugin" --version="$plugin_version" --quiet
-            installed_plugins+=("$plugin")
+            result=$(_wp plugin install "$plugin" --version="$plugin_version" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
 
             continue
         fi
@@ -152,21 +158,37 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
         plugins+=("$plugin")
     done
 
+    unset plugin result
+
+    if [[ -f "$SCRIPTS_DIR/init-plugins.txt" ]]; then
+        while read -r plugin; do
+            if [[ -n $plugin ]] && ! _wp plugin is-installed "$plugin"; then
+                plugins+=("$plugin")
+            fi
+        done < "$SCRIPTS_DIR/init-plugins.txt"
+
+        unset plugin result
+    fi
+
     if ((${#plugins[@]} != 0 )); then
-        echo -e "\e[1;36mInfo:\e[0m Installing '${plugins[@]}' (latest)"
-        _wp plugin install ${plugins[@]} --quiet
+        for plugin in "${plugins[@]}"; do
+            result=$(_wp plugin install "$plugin" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
+        done
 
-        installed_plugins+=("${plugins[@]}")
+        unset plugin result
     fi
 
-    if ((${#installed_plugins[@]} != 0 )); then
-        _wp plugin activate ${installed_plugins[@]}
+    if ((${#plugins_to_activate[@]} != 0 )); then
+        _wp plugin activate ${plugins_to_activate[@]}
     fi
+
     e_end
 fi
 
 if _wp plugin is-active woocommerce; then
     e_start "Set up WooCommerce"
+
     _wp option update woocommerce_store_address "${WC_STORE_ADDRESS:-'Jl. Example No. 123'}"
     _wp option update woocommerce_store_city "${WC_STORE_CITY:-'Batang'}"
     _wp option update woocommerce_default_country "${WC_DEFAULT_COUNTRY:-'ID:JT'}"
@@ -184,27 +206,32 @@ if _wp plugin is-active woocommerce; then
 
     # Mark the task list as complete
     _wp option update woocommerce_task_list_complete yes
+
     e_end
 fi
 
 if [[ -n "${SITE_THEMES:-}" ]]; then
-    e_start 'Set up default themes'
+    e_start 'Set up themes'
+
     themes=()
 
     for theme in ${SITE_THEMES//,/ }; do
         if _wp theme is-installed "$theme"; then
             echo " - $theme is already installed."
+
             continue
         fi
 
         theme_version="${theme_supports[$theme]:-}"
         if [[ "$theme_version" == "none" ]]; then
-            echo -e "\e[1;36mNotice:\e[0m Skipping '$plugin' - incompatible with WordPress ${WP_VERSION}"
+            echo -e "\e[1;36mNotice:\e[0m Skipping '$theme' - incompatible with WordPress ${WP_VERSION}"
+
             continue
         fi
 
         if [[ -n "$theme_version" ]]; then
-            _wp theme install "$theme" --version=$theme_version
+            result=$(_wp theme install "$theme" --version="$theme_version" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
 
             continue
         fi
@@ -212,8 +239,25 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
         themes+=("$theme")
     done
 
+    unset theme result
+
+    if [[ -f "$SCRIPTS_DIR/init-themes.txt" ]]; then
+        while read -r theme; do
+            if [[ -n $theme ]] && ! _wp theme is-installed "$theme"; then
+                themes+=("$theme")
+            fi
+        done < "$SCRIPTS_DIR/init-themes.txt"
+
+        unset theme result
+    fi
+
     if ((${#themes[@]} != 0 )); then
-        _wp theme install ${themes[@]}
+        for theme in "${themes[@]}"; do
+            result=$(_wp theme install "$theme" | head -n 1)
+            echo -e "\e[1;36mInfo:\e[0m $result"
+        done
+
+        unset theme result
     fi
 
     SITE_DEFAULT_THEME=${SITE_DEFAULT_THEME:-}
@@ -221,11 +265,12 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
     if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
         _wp theme activate $SITE_DEFAULT_THEME
     fi
+
     e_end
 fi
 
 if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
-    e_start "Set up MultiSite"
+    e_start "Set up multisite"
 
     if _wp core is-installed --network; then
         echo -e "\e[1;36mNotice:\e[0m Multisite is already installed."
@@ -237,8 +282,8 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
         echo 'Update .htaccess.'
     fi
 
-    if ((${#installed_plugins[@]} != 0 )); then
-        _wp plugin activate ${installed_plugins[@]} --network
+    if ((${#plugins_to_activate[@]} != 0 )); then
+        _wp plugin activate ${plugins_to_activate[@]} --network
     fi
 
     if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
@@ -250,6 +295,7 @@ fi
 
 if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     e_start 'Cleanup'
+
     TRIM_PLUGINS=${TRIM_PLUGINS:-''}
     to_removes=()
 
@@ -262,10 +308,11 @@ if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     if ((${#to_removes[@]} != 0 )); then
         _wp plugin uninstall ${to_removes[@]}
     fi
+
     e_end
 fi
 
-e_start 'Verify Installation'
+e_start 'Verify installation'
 _wp core version --extra
 echo "Site URL: ${SITE_URL}"
 e_end
