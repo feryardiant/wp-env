@@ -118,7 +118,7 @@ else
     for img in "$ASSET_DIR"/*.png; do
         filename=$(basename "$img")
 
-        img_id=$(_wp media import $img --porcelain)
+        img_id=$(_wp media import "$img" --porcelain)
 
         if [[ "$filename" == "$SITE_ICON_FILENAME" ]]; then
             icon_id=$img_id
