@@ -1,6 +1,6 @@
 e_start() {
     if [[ -n "${CI:-}" ]]; then
-        echo "::group::$*"
+        echo -e "::group::$*\e[0m"
     else
         echo -e "> \e[1;33m$*\e[0m"
     fi
