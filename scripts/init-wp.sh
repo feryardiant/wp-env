@@ -309,6 +309,14 @@ if [[ $icon_id -gt 0 ]]; then
     options['site_icon']=$icon_id
 fi
 
+options['thumbnail_size_w']='300'
+options['thumbnail_size_h']='300'
+options['medium_size_w']='500'
+options['medium_size_h']='500'
+options['large_size_w']='1080'
+options['large_size_h']='1080'
+options['blog_upload_space']='50'
+
 for key in "${!options[@]}"; do
     if ! _wp core is-installed --network; then
         _wp option update "$key" "${options[$key]}"
