@@ -332,7 +332,7 @@ fi
 for site_url in $site_urls; do
     site_title=$(_wp --url="$site_url" option get blogname)
 
-    e_start "Set up media: '$site_title'"
+    e_start "Set up media:\e[1m $site_title"
 
     for img in "$ASSET_DIR"/*.png; do
         filename=$(basename "$img")
@@ -343,12 +343,12 @@ for site_url in $site_urls; do
             options['site_icon']=$img_id
         fi
 
-        echo -e "\e[1;36mInfo:\e[0m '$filename' imported (ID: $img_id)"
+        echo -e "\e[1;32mSuccess:\e[0m '$filename' imported (ID: $img_id)"
     done
 
     e_end
 
-    e_start "Set up options: '$site_title'"
+    e_start "Set up options:\e[1m $site_title"
 
     for key in "${!options[@]}"; do
         _wp --url="$site_url" option update "$key" "${options[$key]}"
