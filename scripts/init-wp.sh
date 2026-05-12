@@ -119,7 +119,7 @@ ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
 SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
 INSTALL_DIR=${INSTALL_DIR:-"$PWD/docker/volumes/wordpress"}
 
-SITE_URL=${SITE_URL:-'http://localhost'}
+SITE_URL=${SITE_URL:-"http://localhost"}
 SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
 SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
 
@@ -158,7 +158,7 @@ if _wp core is-installed --url="${SITE_URL}" --allow-root; then
 else
     e_start 'Install WordPress Core'
     _wp core install \
-        --url="${SITE_URL}" --title="${SITE_TITLE:-'WordPress Local'}" \
+        --url="${SITE_URL}" --title="${SITE_TITLE:-"WordPress Local"}" \
         --admin_user="${SITE_ADMIN_USER}" \
         --admin_password="${SITE_ADMIN_PASS:-secret}" \
         --admin_email="${SITE_ADMIN_EMAIL:-"admin@example.com"}" \
@@ -332,7 +332,7 @@ fi
 for site_url in $site_urls; do
     site_title=$(_wp --url="$site_url" option get blogname)
 
-    e_start 'Set up media: '$site_title
+    e_start "Set up media: '$site_title'"
 
     for img in "$ASSET_DIR"/*.png; do
         filename=$(basename "$img")
@@ -348,7 +348,7 @@ for site_url in $site_urls; do
 
     e_end
 
-    e_start 'Set up options: '$site_title
+    e_start "Set up options: '$site_title'"
 
     for key in "${!options[@]}"; do
         _wp --url="$site_url" option update "$key" "${options[$key]}"
