@@ -165,24 +165,9 @@ else
         --skip-email --allow-root
     e_end
 
-    e_start 'Set up media'
     if [[ ! -f "$INSTALL_DIR/favicon.ico" ]]; then
         cp "$ASSET_DIR/favicon.ico" "$INSTALL_DIR/favicon.ico"
     fi
-
-    for img in "$ASSET_DIR"/*.png; do
-        filename=$(basename "$img")
-
-        img_id=$(_wp media import "$img" --porcelain)
-
-        if [[ "$filename" == "$SITE_ICON_FILENAME" ]]; then
-            options['site_icon']=$img_id
-        fi
-
-        echo -e "\e[1;36mInfo:\e[0m '$filename' imported (ID: $img_id)"
-    done
-
-   e_end
 fi
 
 # ==============================================================================
@@ -346,6 +331,22 @@ fi
 
 for site_url in $site_urls; do
     site_title=$(_wp --url="$site_url" option get blogname)
+
+    e_start "Set up media: $site_title"
+
+    for img in "$ASSET_DIR"/*.png; do
+        filename=$(basename "$img")
+
+        img_id=$(_wp --url="$site_url" media import "$img" --porcelain)
+
+        if [[ "$filename" == "$SITE_ICON_FILENAME" ]]; then
+            options['site_icon']=$img_id
+        fi
+
+        echo -e "\e[1;36mInfo:\e[0m '$filename' imported (ID: $img_id)"
+    done
+
+    e_end
 
     e_start "Set up options: $site_title"
 
