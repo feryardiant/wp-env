@@ -330,9 +330,9 @@ else
 fi
 
 for site_url in $site_urls; do
-    site_title=$(_wp --url="$site_url" option get blogname | sed "s/'//g")
+    site_title=$(_wp --url="$site_url" option get blogname)
 
-    e_start "Set up media: $site_title"
+    e_start "Set up media: '$site_title'"
 
     for img in "$ASSET_DIR"/*.png; do
         filename=$(basename "$img")
@@ -348,7 +348,7 @@ for site_url in $site_urls; do
 
     e_end
 
-    e_start "Set up options: $site_title"
+    e_start "Set up options: '$site_title'"
 
     for key in "${!options[@]}"; do
         _wp --url="$site_url" option update "$key" "${options[$key]}"
