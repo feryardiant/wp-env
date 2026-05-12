@@ -134,20 +134,22 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
     for plugin in ${SITE_PLUGINS//,/ }; do
         if _wp plugin is-installed "$plugin"; then
             echo -e "\e[1;36mNotice:\e[0m '$plugin' is already installed."
+
             continue
         fi
 
         plugin_version="${plugin_supports[$plugin]:-}"
         if [[ "$plugin_version" == "none" ]]; then
             echo -e "\e[1;36mNotice:\e[0m Skipping '$plugin' - incompatible with WordPress ${WP_VERSION}"
+
             continue
         fi
+
+        plugins_to_activate+=("$plugin")
 
         if [[ -n "$plugin_version" ]]; then
             result=$(_wp plugin install "$plugin" --version="$plugin_version" | head -n 1)
             echo -e "\e[1;36mInfo:\e[0m $result"
-
-            plugins_to_activate+=("$plugin")
 
             continue
         fi
@@ -160,8 +162,7 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
     if [[ -f "$SCRIPTS_DIR/init-plugins.txt" ]]; then
         while read -r plugin; do
             if [[ -n $plugin ]] && ! _wp plugin is-installed "$plugin"; then
-                result=$(_wp plugin install "$plugin" | head -n 1)
-                echo -e "\e[1;36mInfo:\e[0m $result"
+                plugins+=("$plugin")
             fi
         done < "$SCRIPTS_DIR/init-plugins.txt"
 
@@ -173,8 +174,6 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
             result=$(_wp plugin install "$plugin" | head -n 1)
             echo -e "\e[1;36mInfo:\e[0m $result"
         done
-
-        plugins_to_activate+=("${plugins[@]}")
 
         unset plugin result
     fi
@@ -214,12 +213,14 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
     for theme in ${SITE_THEMES//,/ }; do
         if _wp theme is-installed "$theme"; then
             echo " - $theme is already installed."
+
             continue
         fi
 
         theme_version="${theme_supports[$theme]:-}"
         if [[ "$theme_version" == "none" ]]; then
             echo -e "\e[1;36mNotice:\e[0m Skipping '$plugin' - incompatible with WordPress ${WP_VERSION}"
+
             continue
         fi
 
@@ -238,8 +239,7 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
     if [[ -f "$SCRIPTS_DIR/init-themes.txt" ]]; then
         while read -r theme; do
             if [[ -n $theme ]] && ! _wp theme is-installed "$theme"; then
-                result=$(_wp theme install "$theme" | head -n 1)
-                echo -e "\e[1;36mInfo:\e[0m $result"
+                themes+=("$theme")
             fi
         done < "$SCRIPTS_DIR/init-themes.txt"
 
