@@ -115,7 +115,7 @@ else
         cp "$ASSET_DIR/favicon.ico" "$INSTALL_DIR/favicon.ico"
     fi
 
-    for img in $ASSET_DIR/*.png; do
+    for img in "$ASSET_DIR"/*.png; do
         filename=$(basename "$img")
 
         img_id=$(_wp media import $img --porcelain)
