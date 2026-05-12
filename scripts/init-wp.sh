@@ -63,7 +63,9 @@ declare -A theme_supports
 
 theme_supports['blocksy']="${wp_themes[0]:-2.0.86}"
 
-ASSET_DIR=${ASSET_DIR:-"$PWD/assets"}
+SETUP_DIR=${SETUP_DIR:-"$PWD"}
+ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
+SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
 INSTALL_DIR=${INSTALL_DIR:-"$PWD/docker/volumes/wordpress"}
 
 if [[ ! -d "${ASSET_DIR}" ]]; then
