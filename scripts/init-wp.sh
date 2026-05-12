@@ -161,7 +161,7 @@ else
         --url="${SITE_URL}" --title="${SITE_TITLE:-'WordPress Local'}" \
         --admin_user="${SITE_ADMIN_USER}" \
         --admin_password="${SITE_ADMIN_PASS:-secret}" \
-        --admin_email="${SITE_ADMIN_EMAIL:-'admin@example.com'}" \
+        --admin_email="${SITE_ADMIN_EMAIL:-"admin@example.com"}" \
         --skip-email --allow-root
     e_end
 
