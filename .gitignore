@@ -49,7 +49,7 @@ coverage
 *.lcov
 
 # Additional plugins and themes
-scripts/setup-*.txt
+scripts/init-*.txt
 
 # Other package managers
 packages/*/composer.lock

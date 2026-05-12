@@ -157,13 +157,13 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
 
     unset plugin result
 
-    if [[ -f "$SCRIPTS_DIR/setup-plugins.txt" ]]; then
+    if [[ -f "$SCRIPTS_DIR/init-plugins.txt" ]]; then
         while read -r plugin; do
             if [[ -n $plugin ]] && ! _wp plugin is-installed "$plugin"; then
                 result=$(_wp plugin install "$plugin" | head -n 1)
                 echo -e "\e[1;36mInfo:\e[0m $result"
             fi
-        done < "$SCRIPTS_DIR/setup-plugins.txt"
+        done < "$SCRIPTS_DIR/init-plugins.txt"
 
         unset plugin result
     fi
@@ -235,13 +235,13 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
 
     unset theme result
 
-    if [[ -f "$SCRIPTS_DIR/setup-themes.txt" ]]; then
+    if [[ -f "$SCRIPTS_DIR/init-themes.txt" ]]; then
         while read -r theme; do
             if [[ -n $theme ]] && ! _wp theme is-installed "$theme"; then
                 result=$(_wp theme install "$theme" | head -n 1)
                 echo -e "\e[1;36mInfo:\e[0m $result"
             fi
-        done < "$SCRIPTS_DIR/setup-themes.txt"
+        done < "$SCRIPTS_DIR/init-themes.txt"
 
         unset theme result
     fi
