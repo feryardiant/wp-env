@@ -113,7 +113,7 @@ else
         cp "$ASSET_DIR/favicon.ico" "$INSTALL_DIR/favicon.ico"
     fi
 
-                     # Post ID   4              5         6        7
+    # ---------------- Post ID   4              5         6        7
     _wp media import $ASSET_DIR/{WordPress-Logo,Acme-Logo,No-Image,Image-Placeholder}.png
     e_end
 
@@ -128,6 +128,7 @@ plugins_to_activate=()
 
 if [[ -n "${SITE_PLUGINS:-}" ]]; then
     e_start 'Set up plugins'
+
     SITE_PLUGINS=${SITE_PLUGINS:-''}
     plugins=()
 
@@ -181,11 +182,13 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
     if ((${#plugins_to_activate[@]} != 0 )); then
         _wp plugin activate ${plugins_to_activate[@]}
     fi
+
     e_end
 fi
 
 if _wp plugin is-active woocommerce; then
     e_start "Set up WooCommerce"
+
     _wp option update woocommerce_store_address "${WC_STORE_ADDRESS:-'Jl. Example No. 123'}"
     _wp option update woocommerce_store_city "${WC_STORE_CITY:-'Batang'}"
     _wp option update woocommerce_default_country "${WC_DEFAULT_COUNTRY:-'ID:JT'}"
@@ -203,11 +206,13 @@ if _wp plugin is-active woocommerce; then
 
     # Mark the task list as complete
     _wp option update woocommerce_task_list_complete yes
+
     e_end
 fi
 
 if [[ -n "${SITE_THEMES:-}" ]]; then
     e_start 'Set up themes'
+
     themes=()
 
     for theme in ${SITE_THEMES//,/ }; do
@@ -260,11 +265,12 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
     if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
         _wp theme activate $SITE_DEFAULT_THEME
     fi
+
     e_end
 fi
 
 if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
-    e_start "Set up multiSite"
+    e_start "Set up multisite"
 
     if _wp core is-installed --network; then
         echo -e "\e[1;36mNotice:\e[0m Multisite is already installed."
@@ -289,6 +295,7 @@ fi
 
 if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     e_start 'Cleanup'
+
     TRIM_PLUGINS=${TRIM_PLUGINS:-''}
     to_removes=()
 
@@ -301,6 +308,7 @@ if [[ -n "${TRIM_PLUGINS:-}" ]]; then
     if ((${#to_removes[@]} != 0 )); then
         _wp plugin uninstall ${to_removes[@]}
     fi
+
     e_end
 fi
 
