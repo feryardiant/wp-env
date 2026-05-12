@@ -63,6 +63,39 @@ declare -A theme_supports
 
 theme_supports['blocksy']="${wp_themes[0]:-2.0.86}"
 
+declare -A options
+
+options['permalink_structure']='/%postname%/'
+options['timezone_string']="${SITE_TIMEZONE:-Asia/Jakarta}"
+options['thumbnail_size_w']='300'
+options['thumbnail_size_h']='300'
+options['medium_size_w']='500'
+options['medium_size_h']='500'
+options['large_size_w']='1080'
+options['large_size_h']='1080'
+options['blog_upload_space']='50'
+
+declare -A woo_options
+
+woo_options['store_address']=${WC_STORE_ADDRESS:-Jl. Example No. 123}
+woo_options['store_city']=${WC_STORE_CITY:-Batang}
+woo_options['default_country']=${WC_DEFAULT_COUNTRY:-ID:JT}
+woo_options['currency']=${WC_CURRENCY:-IDR}
+woo_options['currency_pos']=${WC_CURRENCY_POS:-left_space}
+woo_options['store_postcode']=${WC_STORE_POSTCODE:-12345}
+
+woo_options['allowed_countries']=${WC_ALLOWED_COUNTRIES:-specific}
+woo_options['all_except_countries']=${WC_ALL_EXCEPT_COUNTRIES:-'[]'}
+woo_options['specific_allowed_countries']=${WC_SPECIFIC_ALLOWED_COUNTRIES:-'["ID"]'}
+woo_options['ship_to_countries']=${WC_SHIP_TO_COUNTRIES:-specific}
+woo_options['specific_ship_to_countries']=${WC_SPECIFIC_SHIP_TO_COUNTRIES:-'["ID"]'}
+
+woo_options['weight_unit']=${WC_WEIGHT_UNIT:-kg}
+woo_options['dimension_unit']=${WC_DIMENSION_UNIT:-cm}
+woo_options['price_thousand_sep']=${WC_PRICE_THOUSAND_SEP:-.}
+woo_options['price_decimal_sep']=${WC_PRICE_DECIMAL_SEP:-,}
+woo_options['price_num_decimals']=${WC_PRICE_DECIMAL_NUM:-0}
+
 SETUP_DIR=${SETUP_DIR:-"$PWD"}
 ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
 SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
@@ -77,7 +110,6 @@ fi
 SITE_URL=${SITE_URL:-'http://localhost'}
 SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
 SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
-icon_id=0
 
 if [[ ${WP_RESET:-0} -eq 1 ]]; then
     e_start "Reset WordPress Core"
@@ -122,7 +154,7 @@ else
         img_id=$(_wp media import "$img" --porcelain)
 
         if [[ "$filename" == "$SITE_ICON_FILENAME" ]]; then
-            icon_id=$img_id
+            options['site_icon']=$img_id
         fi
 
         echo -e "\e[1;36mInfo:\e[0m '$filename' imported (ID: $img_id)"
@@ -275,44 +307,6 @@ if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
 
     e_end
 fi
-
-declare -A options
-
-options['permalink_structure']='/%postname%/'
-options['timezone_string']="${SITE_TIMEZONE:-Asia/Jakarta}"
-
-if [[ $icon_id -gt 0 ]]; then
-    options['site_icon']=$icon_id
-fi
-
-options['thumbnail_size_w']='300'
-options['thumbnail_size_h']='300'
-options['medium_size_w']='500'
-options['medium_size_h']='500'
-options['large_size_w']='1080'
-options['large_size_h']='1080'
-options['blog_upload_space']='50'
-
-declare -A woo_options
-
-woo_options['store_address']=${WC_STORE_ADDRESS:-Jl. Example No. 123}
-woo_options['store_city']=${WC_STORE_CITY:-Batang}
-woo_options['default_country']=${WC_DEFAULT_COUNTRY:-ID:JT}
-woo_options['currency']=${WC_CURRENCY:-IDR}
-woo_options['currency_pos']=${WC_CURRENCY_POS:-left_space}
-woo_options['store_postcode']=${WC_STORE_POSTCODE:-12345}
-
-woo_options['allowed_countries']=${WC_ALLOWED_COUNTRIES:-specific}
-woo_options['all_except_countries']=${WC_ALL_EXCEPT_COUNTRIES:-'[]'}
-woo_options['specific_allowed_countries']=${WC_SPECIFIC_ALLOWED_COUNTRIES:-'["ID"]'}
-woo_options['ship_to_countries']=${WC_SHIP_TO_COUNTRIES:-specific}
-woo_options['specific_ship_to_countries']=${WC_SPECIFIC_SHIP_TO_COUNTRIES:-'["ID"]'}
-
-woo_options['weight_unit']=${WC_WEIGHT_UNIT:-kg}
-woo_options['dimension_unit']=${WC_DIMENSION_UNIT:-cm}
-woo_options['price_thousand_sep']=${WC_PRICE_THOUSAND_SEP:-.}
-woo_options['price_decimal_sep']=${WC_PRICE_DECIMAL_SEP:-,}
-woo_options['price_num_decimals']=${WC_PRICE_DECIMAL_NUM:-0}
 
 if _wp core is-installed --network; then
     site_urls=$(_wp site list --field=url)
