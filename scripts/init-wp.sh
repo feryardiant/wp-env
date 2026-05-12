@@ -330,7 +330,7 @@ else
 fi
 
 for site_url in $site_urls; do
-    site_title="$(_wp --url="$site_url" option get blogname)"
+    site_title=$(_wp --url="$site_url" option get blogname | sed "s/'//g")
 
     e_start "Set up media: $site_title"
 
