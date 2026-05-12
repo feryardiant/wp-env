@@ -233,6 +233,17 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
 
     unset theme result
 
+    if [[ -f "$SCRIPTS_DIR/setup-themes.txt" ]]; then
+        while read theme; do
+            if [[ -n $theme ]] && ! _wp theme is-installed "$theme"; then
+                result=$(_wp theme install "$theme" | head -n 1)
+                echo -e "\e[1;36mInfo:\e[0m $result"
+            fi
+        done < "$SCRIPTS_DIR/setup-themes.txt"
+
+        unset theme result
+    fi
+
     if ((${#themes[@]} != 0 )); then
         for theme in "${themes[@]}"; do
             result=$(_wp theme install "$theme" | head -n 1)
