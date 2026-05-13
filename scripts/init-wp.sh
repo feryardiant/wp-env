@@ -43,24 +43,6 @@ themes_map['6.9']='2.1.41'
 
 # ==============================================================================
 
-if [[ -f "$PWD/.env" ]]; then
-    . "$PWD/.env"
-fi
-
-WP_VERSION=${WP_VERSION:-'5.9'}
-# Reduce to major.minor for map lookup
-wp_version_key=$(echo "${WP_VERSION}" | awk -F. '{printf "%s.%s", $1, $2}')
-
-wp_plugins=(${plugins_map[${wp_version_key}]:-})
-wp_themes=(${themes_map[${wp_version_key}]:-})
-
-if ((${#wp_themes[@]} == 0 )); then
-    echo -e "\e[1;31mError:\e[0m Unsupported WordPress version ${WP_VERSION}."
-    exit 1
-fi
-
-# ==============================================================================
-
 declare -A plugin_supports
 
 plugin_supports['blocksy-companion']="${wp_plugins[0]:-2.0.86}"
@@ -114,6 +96,24 @@ woo_options['price_num_decimals']=${WC_PRICE_DECIMAL_NUM:-0}
 
 # ==============================================================================
 
+if [[ -f "$PWD/.env" ]]; then
+    . "$PWD/.env"
+fi
+
+WP_VERSION=${WP_VERSION:-'5.9'}
+# Reduce to major.minor for map lookup
+wp_version_key=$(echo "${WP_VERSION}" | awk -F. '{printf "%s.%s", $1, $2}')
+
+wp_plugins=(${plugins_map[${wp_version_key}]:-})
+wp_themes=(${themes_map[${wp_version_key}]:-})
+
+if ((${#wp_themes[@]} == 0 )); then
+    echo -e "\e[1;31mError:\e[0m Unsupported WordPress version ${WP_VERSION}."
+    exit 1
+fi
+
+# ==============================================================================
+
 SETUP_DIR=${SETUP_DIR:-"$PWD"}
 ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
 SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
@@ -122,6 +122,7 @@ INSTALL_DIR=${INSTALL_DIR:-"$PWD/docker/volumes/wordpress"}
 SITE_URL=${SITE_URL:-"http://localhost"}
 SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
 SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
+SITE_DEFAULT_THEME=${SITE_DEFAULT_THEME:-}
 
 if [[ ! -d "${ASSET_DIR}" ]]; then
     echo -e "\e[1;31mError:\e[0m Unable to continue installation."
@@ -197,8 +198,8 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
         plugins_to_activate+=("$plugin")
 
         if [[ -n "$plugin_version" ]]; then
-            result=$(_wp plugin install "$plugin" --version="$plugin_version" | head -n 1)
-            echo -e "\e[1;36mInfo:\e[0m $result"
+            result=$(_wp plugin install "$plugin" --version="$plugin_version" | head -n 1 | sed 's/^Installing\s\(.*\)$/\1/')
+            echo -e "\e[1;32mSuccess:\e[0m Installed $result"
 
             continue
         fi
@@ -220,15 +221,18 @@ if [[ -n "${SITE_PLUGINS:-}" ]]; then
 
     if ((${#plugins[@]} != 0 )); then
         for plugin in "${plugins[@]}"; do
-            result=$(_wp plugin install "$plugin" | head -n 1)
-            echo -e "\e[1;36mInfo:\e[0m $result"
+            result=$(_wp plugin install "$plugin" | head -n 1 | sed 's/^Installing\s\(.*\)$/\1/')
+            echo -e "\e[1;32mSuccess:\e[0m Installed $result"
         done
 
         unset plugin result
     fi
 
-    if ((${#plugins_to_activate[@]} != 0 )); then
-        _wp plugin activate ${plugins_to_activate[@]}
+    if [[ ${MULTISITE_ENABLED:-0} -eq 0 ]] && ((${#plugins_to_activate[@]} != 0 )); then
+        for plugin in "${plugins_to_activate[@]}"; do
+            result=$(_wp plugin activate "$plugin" | head -n 1)
+            echo -e "\e[1;32mSuccess:\e[0m $result"
+        done
     fi
 
     e_end
@@ -236,9 +240,46 @@ fi
 
 # ==============================================================================
 
-if [[ -n "${SITE_THEMES:-}" ]]; then
-    e_start 'Set up themes'
+if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
+    e_start "Set up multisite"
 
+    if _wp core is-installed --network; then
+        echo -e "\e[1;36mNotice:\e[0m Multisite is already installed."
+    else
+        _wp core multisite-convert
+
+        # https://developer.wordpress.org/advanced-administration/server/web-server/httpd/#multisite
+        cat "$ASSET_DIR/.htaccess.multisite" > "$INSTALL_DIR/.htaccess"
+        echo -e "\e[1;32mSuccess:\e[0m Updated '.htaccess'."
+    fi
+
+    if ((${#plugins_to_activate[@]} != 0 )); then
+        for plugin in "${plugins_to_activate[@]}"; do
+            result=$(_wp plugin activate "$plugin" --network | head -n 1)
+            echo -e "\e[1;32mSuccess:\e[0m $result"
+        done
+    fi
+
+    if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
+        _wp theme enable $SITE_DEFAULT_THEME --network
+    fi
+
+    e_end
+fi
+
+# ==============================================================================
+
+if _wp core is-installed --network; then
+    site_urls=$(_wp site list --field=url)
+else
+    site_urls="$SITE_URL"
+fi
+
+# ==============================================================================
+
+e_start 'Set up themes'
+
+if [[ -n "${SITE_THEMES:-}" ]]; then
     themes=()
 
     for theme in ${SITE_THEMES//,/ }; do
@@ -256,8 +297,8 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
         fi
 
         if [[ -n "$theme_version" ]]; then
-            result=$(_wp theme install "$theme" --version="$theme_version" | head -n 1)
-            echo -e "\e[1;36mInfo:\e[0m $result"
+            result=$(_wp theme install "$theme" --version="$theme_version" | head -n 1 | sed 's/^Installing\s\(.*\)$/\1/')
+            echo -e "\e[1;32mSuccess:\e[0m Installed $result"
 
             continue
         fi
@@ -279,60 +320,31 @@ if [[ -n "${SITE_THEMES:-}" ]]; then
 
     if ((${#themes[@]} != 0 )); then
         for theme in "${themes[@]}"; do
-            result=$(_wp theme install "$theme" | head -n 1)
-            echo -e "\e[1;36mInfo:\e[0m $result"
+            result=$(_wp theme install "$theme" | head -n 1 | sed 's/^Installing\s\(.*\)$/\1/')
+            echo -e "\e[1;32mSuccess:\e[0m Installed $result"
         done
 
         unset theme result
     fi
-
-    SITE_DEFAULT_THEME=${SITE_DEFAULT_THEME:-}
-
-    if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
-        _wp theme activate $SITE_DEFAULT_THEME
-    fi
-
-    e_end
 fi
+
+if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
+    for site_url in $site_urls; do
+        site_title=$(_wp --url="$site_url" option get blogname)
+
+        result=$(_wp --url="$site_url" theme activate $SITE_DEFAULT_THEME | head -n 1)
+        echo -e "$result ($site_title)"
+    done
+fi
+
+e_end
 
 # ==============================================================================
-
-if [[ ${MULTISITE_ENABLED:-0} -eq 1 ]]; then
-    e_start "Set up multisite"
-
-    if _wp core is-installed --network; then
-        echo -e "\e[1;36mNotice:\e[0m Multisite is already installed."
-    else
-        _wp core multisite-convert
-
-        # https://developer.wordpress.org/advanced-administration/server/web-server/httpd/#multisite
-        cat "$ASSET_DIR/.htaccess.multisite" > "$INSTALL_DIR/.htaccess"
-        echo 'Update .htaccess.'
-    fi
-
-    if ((${#plugins_to_activate[@]} != 0 )); then
-        _wp plugin activate ${plugins_to_activate[@]} --network
-    fi
-
-    if [[ -n "$SITE_DEFAULT_THEME" ]] && _wp theme is-installed "$SITE_DEFAULT_THEME"; then
-        _wp theme enable $SITE_DEFAULT_THEME --network
-    fi
-
-    e_end
-fi
-
-# ==============================================================================
-
-if _wp core is-installed --network; then
-    site_urls=$(_wp site list --field=url)
-else
-    site_urls="$SITE_URL"
-fi
 
 for site_url in $site_urls; do
     site_title=$(_wp --url="$site_url" option get blogname)
 
-    e_start "Set up media:\e[1m $site_title"
+    e_start "Set up media:\e[1;0m $site_title"
 
     for img in "$ASSET_DIR"/*.png; do
         filename=$(basename "$img")
@@ -348,7 +360,7 @@ for site_url in $site_urls; do
 
     e_end
 
-    e_start "Set up options:\e[1m $site_title"
+    e_start "Set up options:\e[1;0m $site_title"
 
     for key in "${!options[@]}"; do
         _wp --url="$site_url" option update "$key" "${options[$key]}"
