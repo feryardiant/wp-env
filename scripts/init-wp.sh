@@ -4,8 +4,30 @@ set -euo pipefail
 
 . "$(dirname "$0")/_util.sh"
 
+if [[ -f "$PWD/.env" ]]; then
+    . "$PWD/.env"
+fi
+
 # ==============================================================================
 # Configurations
+# ==============================================================================
+
+SETUP_DIR=${SETUP_DIR:-"$PWD"}
+ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
+SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
+INSTALL_DIR=${INSTALL_DIR:-"$PWD/docker/volumes/wordpress"}
+
+if [[ ! -d "${ASSET_DIR}" ]]; then
+    echo -e "\e[1;31mError:\e[0m Unable to continue installation."
+    echo -e "       Asset directory '\e[33m${ASSET_DIR}\e[0m' is missing."
+    exit 1
+fi
+
+SITE_URL=${SITE_URL:-"http://localhost"}
+SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
+SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
+SITE_DEFAULT_THEME=${SITE_DEFAULT_THEME:-}
+
 # ==============================================================================
 
 declare -A plugins_map
@@ -40,22 +62,6 @@ themes_map['6.6']='2.1.41'
 themes_map['6.7']='2.1.41'
 themes_map['6.8']='2.1.41'
 themes_map['6.9']='2.1.41'
-
-# ==============================================================================
-
-declare -A plugin_supports
-
-plugin_supports['blocksy-companion']="${wp_plugins[0]:-2.0.86}"
-plugin_supports['plugin-check']="${wp_plugins[1]:-0.2.0}"
-plugin_supports['contact-form-7']="${wp_plugins[2]:-5.7.7}"
-plugin_supports['jetpack']="${wp_plugins[3]:-11.2.2}"
-plugin_supports['woocommerce']="${wp_plugins[4]:-7.5.2}"
-
-# ==============================================================================
-
-declare -A theme_supports
-
-theme_supports['blocksy']="${wp_themes[0]:-2.0.86}"
 
 # ==============================================================================
 
@@ -96,11 +102,7 @@ woo_options['price_num_decimals']=${WC_PRICE_DECIMAL_NUM:-0}
 
 # ==============================================================================
 
-if [[ -f "$PWD/.env" ]]; then
-    . "$PWD/.env"
-fi
-
-WP_VERSION=${WP_VERSION:-'5.9'}
+WP_VERSION=${WP_VERSION:-"5.9"}
 # Reduce to major.minor for map lookup
 wp_version_key=$(echo "${WP_VERSION}" | awk -F. '{printf "%s.%s", $1, $2}')
 
@@ -112,23 +114,17 @@ if ((${#wp_themes[@]} == 0 )); then
     exit 1
 fi
 
-# ==============================================================================
+declare -A plugin_supports
 
-SETUP_DIR=${SETUP_DIR:-"$PWD"}
-ASSET_DIR=${ASSET_DIR:-"$SETUP_DIR/assets"}
-SCRIPTS_DIR=${SCRIPTS_DIR:-"$SETUP_DIR/scripts"}
-INSTALL_DIR=${INSTALL_DIR:-"$PWD/docker/volumes/wordpress"}
+plugin_supports['blocksy-companion']="${wp_plugins[0]:-2.0.86}"
+plugin_supports['plugin-check']="${wp_plugins[1]:-0.2.0}"
+plugin_supports['contact-form-7']="${wp_plugins[2]:-5.7.7}"
+plugin_supports['jetpack']="${wp_plugins[3]:-11.2.2}"
+plugin_supports['woocommerce']="${wp_plugins[4]:-7.5.2}"
 
-SITE_URL=${SITE_URL:-"http://localhost"}
-SITE_ADMIN_USER=${SITE_ADMIN_USER:-admin}
-SITE_ICON_FILENAME=${SITE_ICON_FILENAME:-"WordPress-Logo.png"}
-SITE_DEFAULT_THEME=${SITE_DEFAULT_THEME:-}
+declare -A theme_supports
 
-if [[ ! -d "${ASSET_DIR}" ]]; then
-    echo -e "\e[1;31mError:\e[0m Unable to continue installation."
-    echo -e "       Asset directory '\e[33m${ASSET_DIR}\e[0m' is missing."
-    exit 1
-fi
+theme_supports['blocksy']="${wp_themes[0]:-2.0.86}"
 
 # ==============================================================================
 # Executions
