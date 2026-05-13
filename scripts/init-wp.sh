@@ -362,7 +362,7 @@ for site_url in $site_urls; do
         _wp --url="$site_url" option update "$key" "${options[$key]}"
     done
 
-    if _wp --url="$site_url" plugin is-active woocommerce; then
+    if _wp --url="$site_url" plugin is-active woocommerce || _wp --url="$site_url" plugin is-active woocommerce --network; then
         for key in "${!woo_options[@]}"; do
             format=$([[ "${woo_options[$key]}" == '['*']' ]] && echo 'json' || echo 'plaintext')
 
@@ -378,7 +378,6 @@ for site_url in $site_urls; do
 
         # Install default woocommerce pages
         _wp --url="$site_url" wc --user="$SITE_ADMIN_USER" tool run install_pages
-
     fi
 
     unset key
