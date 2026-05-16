@@ -64,22 +64,22 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ env.PHP_VERSION }}
           coverage: xdebug
 
       - name: Set up Composer cache
         uses: actions/cache@v5
         with:
           path: ${{ needs.prepare.outputs.composer-cache-dir }}
-          key: composer-php${{ matrix.php }}-wp${{ matrix.wp }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: composer-php${{ matrix.php }}-wp${{ matrix.wp }}-
+          key: composer-php${{ env.PHP_VERSION }}-wp${{ env.WP_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-php${{ env.PHP_VERSION }}-wp${{ env.WP_VERSION }}-
 
       - name: Set up WP-CLI cache
         uses: actions/cache@v5
         with:
           path: /home/runner/.wp-cli/cache
-          key: wpcli-wp${{ matrix.wp }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: wpcli-wp${{ matrix.wp }}-
+          key: wpcli-wp${{ env.WP_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: wpcli-wp${{ env.WP_VERSION }}-
 
       - name: Install dependencies
         run: |
