@@ -20,7 +20,7 @@ _wp() {
     elif command -v wp > /dev/null 2>&1; then
         wp "$@" --color
     else
-        echo "wp command not found"
+        echo "wp command not found" >&2
         exit 1
     fi
 }
