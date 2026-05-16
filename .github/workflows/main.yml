@@ -111,6 +111,7 @@ jobs:
         run: |
           scripts/make-dist.sh
 
+          cp assets/dist/custom-theme.zip assets/dist/custom-theme-copy.zip
           ls -lah assets/dist
 
       - uses: actions/upload-artifact@v7
