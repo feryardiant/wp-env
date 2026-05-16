@@ -105,9 +105,16 @@ jobs:
           vendor/bin/phpunit --coverage-text
 
       - name: Make dist archive
+        # if: github.event_name == 'push' && github.ref_name == 'main'
         env:
           FORWARD_DB_PORT: ${{ job.services.mysql.ports['3306'] }}
         run: |
           scripts/make-dist.sh
 
           ls -lah assets/dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          overwrite: true
+          path: assets/dist/*.zip
