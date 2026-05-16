@@ -1,2 +1,5 @@
 path: docker/volumes/wordpress
 color: true
+
+require:
+  - scripts/local-env.php
