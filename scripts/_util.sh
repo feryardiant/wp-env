@@ -15,9 +15,12 @@ e_end() {
 }
 
 _wp() {
-    if command -v wp > /dev/null 2>&1; then
+    if [ -x vendor/bin/wp ]; then
+        vendor/bin/wp "$@" --color
+    elif command -v wp > /dev/null 2>&1; then
         wp "$@" --color
     else
-        vendor/bin/wp "$@" --color
+        echo "wp command not found"
+        exit 1
     fi
 }
