@@ -103,3 +103,11 @@ jobs:
       - name: Unit Test
         run: |
           vendor/bin/phpunit --coverage-text
+
+      - name: Make dist archive
+        env:
+          FORWARD_DB_PORT: ${{ job.services.mysql.ports['3306'] }}
+        run: |
+          scripts/make-dist.sh
+
+          ls -lah assets/dist
