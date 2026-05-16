@@ -16,7 +16,7 @@ for pkg_dir in packages/*/; do
         continue
     fi
 
-    composer -qd "$pkg_dir" install
+    composer -d "$pkg_dir" install -q --no-dev
 
     rm -f "$ASSET_DIR/dist/$pkg.*.zip"
 
