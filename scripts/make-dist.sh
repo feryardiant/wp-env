@@ -18,11 +18,13 @@ for pkg_dir in packages/*/; do
 
     composer -d "$pkg_dir" install -q --no-dev
 
-    rm -f "$ASSET_DIR/dist/$pkg.*.zip"
+    rm -f "$ASSET_DIR/dist/$pkg"*.zip
 
     cp LICENSE-GPL "$pkg_dir/license.txt"
 
+    _wp i18n make-pot "$pkg_dir" "$pkg_dir/languages/$pkg.pot"
+
     _wp dist-archive "$pkg_dir" "$ASSET_DIR/dist" --force --create-target-dir
 
-    rm "$pkg_dir/license.txt" "$pkg_dir/composer.lock"
+    rm "$pkg_dir"/{license.txt,composer.lock}
 done
