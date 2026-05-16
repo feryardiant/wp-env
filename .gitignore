@@ -53,6 +53,7 @@ scripts/init-*.txt
 
 # Other package managers
 packages/*/composer.lock
+packages/*/license.txt
 yarn.lock
 pnpm-lock.yaml
 package-lock.json

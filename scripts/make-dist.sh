@@ -16,7 +16,7 @@ for pkg_dir in packages/*/; do
         continue
     fi
 
-    composer -d "$pkg_dir" install
+    composer -qd "$pkg_dir" install
 
     rm -f "$ASSET_DIR/dist/$pkg.*.zip"
 
@@ -24,5 +24,5 @@ for pkg_dir in packages/*/; do
 
     _wp dist-archive "$pkg_dir" "$ASSET_DIR/dist" --force --create-target-dir
 
-    rm "$pkg_dir/license.txt"
+    rm "$pkg_dir/license.txt" "$pkg_dir/composer.lock"
 done
