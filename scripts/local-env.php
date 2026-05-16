@@ -2,11 +2,13 @@
 
 $root_path = dirname(__DIR__);
 
-require_once $root_path . '/vendor/autoload.php';
+if ( file_exists($root_path . '/vendor/autoload.php') ) {
+    require_once $root_path . '/vendor/autoload.php';
+}
 
-$dotenv = Dotenv\Dotenv::createImmutable($root_path);
-
-$dotenv->safeLoad();
+if ( file_exists($root_path . '/.env') ) {
+    Dotenv\Dotenv::createImmutable($root_path)->safeLoad();
+}
 
 putenv("WORDPRESS_DB_NAME=" . ($_ENV['DB_NAME'] ?? 'wordpress'));
 putenv("WORDPRESS_DB_USER=" . ($_ENV['DB_USER'] ?? 'secret'));
