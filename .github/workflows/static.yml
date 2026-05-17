@@ -27,6 +27,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v6
+      with:
+        ref: ${{ github.event.workflow_run.head_sha }}
 
     - name: Download artifacts
       uses: actions/download-artifact@v8
@@ -45,6 +47,7 @@ jobs:
       uses: actions/upload-pages-artifact@v5
       with:
         path: assets/dist
+        include-hidden-files: true
 
     - name: Deploy
       id: deployed
