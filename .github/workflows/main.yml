@@ -108,9 +108,7 @@ jobs:
 
       - name: Make dist archive
         id: dist-archive
-        if: |-
-          github.event_name == 'push' && github.ref_name == 'main' &&
-          startsWith(github.event.head_commit.message, 'chore(release):')
+        if: github.event_name == 'push' && github.ref_name == 'main'
         env:
           FORWARD_DB_PORT: ${{ job.services.mysql.ports['3306'] }}
         run: |
@@ -128,7 +126,9 @@ jobs:
   update-releases:
     name: Update released assets
     needs: tests
-    if: needs.tests.outputs.should-upload == '1'
+    if: |-
+      needs.tests.outputs.should-upload == '1' &&
+      startsWith(github.event.head_commit.message, 'chore(release):')
     runs-on: ubuntu-latest
 
     permissions:
