@@ -8,6 +8,11 @@ github_actions:
       - any-glob-to-any-file:
           - 'packages/custom-theme/**'
 
+assets:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'assets/**'
+
 tests:
   - changed-files:
       - any-glob-to-any-file:
