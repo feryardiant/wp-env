@@ -22,6 +22,8 @@ jobs:
     name: with WP ${{ matrix.wp }} on PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     needs: [prepare]
+    outputs:
+      should-upload: ${{ steps.dist-archive.outputs.should-upload }}
 
     env:
       DB_NAME: ${{ github.repository_owner }}
@@ -64,22 +66,22 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ env.PHP_VERSION }}
           coverage: xdebug
 
       - name: Set up Composer cache
         uses: actions/cache@v5
         with:
           path: ${{ needs.prepare.outputs.composer-cache-dir }}
-          key: composer-php${{ matrix.php }}-wp${{ matrix.wp }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: composer-php${{ matrix.php }}-wp${{ matrix.wp }}-
+          key: composer-php${{ env.PHP_VERSION }}-wp${{ env.WP_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-php${{ env.PHP_VERSION }}-wp${{ env.WP_VERSION }}-
 
       - name: Set up WP-CLI cache
         uses: actions/cache@v5
         with:
           path: /home/runner/.wp-cli/cache
-          key: wpcli-wp${{ matrix.wp }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: wpcli-wp${{ matrix.wp }}-
+          key: wpcli-wp${{ env.WP_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: wpcli-wp${{ env.WP_VERSION }}-
 
       - name: Install dependencies
         run: |
@@ -103,3 +105,64 @@ jobs:
       - name: Unit Test
         run: |
           vendor/bin/phpunit --coverage-text
+
+      - name: Make dist archive
+        id: dist-archive
+        if: |-
+          github.event_name == 'push' && github.ref_name == 'main' &&
+          startsWith(github.event.head_commit.message, 'chore(release):')
+        env:
+          FORWARD_DB_PORT: ${{ job.services.mysql.ports['3306'] }}
+        run: |
+          scripts/make-dist.sh
+
+          echo "should-upload=1" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v7
+        if: steps.dist-archive.outputs.should-upload == '1'
+        with:
+          name: release-archives
+          overwrite: true
+          path: assets/dist
+
+  update-releases:
+    name: Update released assets
+    needs: tests
+    if: needs.tests.outputs.should-upload == '1'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-archives
+          path: releases
+
+      - name: Update release assets
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          LATEST_COMMIT: ${{ github.event.head_commit.message }}
+        run: |
+          RELEASE_VERSION=$(echo "$LATEST_COMMIT" | head -n 1 | sed 's/chore(release): /v/')
+
+          for _ in {1..10}; do
+            echo "Checking for release $RELEASE_VERSION to be available..."
+            gh release view "$RELEASE_VERSION" >/dev/null 2>&1 && break
+            sleep 5s
+          done
+
+          gh release view "$RELEASE_VERSION" >/dev/null 2>&1 || {
+            echo "Release $RELEASE_VERSION is not available yet" >&2
+            exit 1
+          }
+
+          shopt -s nullglob
+
+          for to_upload in releases/*.zip; do
+            [[ -z "$to_upload" || ! -f "$to_upload" ]] && continue
+
+            echo "Uploading $to_upload..."
+            gh release upload "$RELEASE_VERSION" "${to_upload}" --clobber
+          done
