@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.7](https://github.com/feryardiant/wp-env/compare/v0.0.6...v0.0.7) (2026-05-17)
+
+
+### Features
+
+* make use of `projek-xyz/actions` uploads workflow ([cb80220](https://github.com/feryardiant/wp-env/commit/cb8022001d5bd336eae55e862fc8bf462431b6b1))
+
 ## [0.0.6](https://github.com/feryardiant/wp-env/compare/v0.0.5...v0.0.6) (2026-05-17)
 
 ## [0.0.5](https://github.com/feryardiant/wp-env/compare/v0.0.4...v0.0.5) (2026-05-17)
