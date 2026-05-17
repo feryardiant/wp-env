@@ -1,0 +1,53 @@
+name: Static
+
+on:
+  workflow_run:
+    workflows: [Tests, Release]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: ${{ workflow_run.conclusion == 'success' }}
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v8
+      with:
+        name: release-archives
+        path: assets/dist
+        run-id: ${{ workflow_run.id }}
+
+    - name: Prepare
+      shell: bash
+      run: |
+        cp assets/*.{html,png,svg,ico} assets/dist/
+        cp assets/.nojekyll assets/dist/
+
+    - name: Store
+      uses: actions/upload-pages-artifact@v5
+      with:
+        path: assets/dist
+
+    - name: Deploy
+      if: github.event_name == 'push'
+      uses: actions/deploy-pages@v5
+      with:
+        token: ${{ github.token }}
