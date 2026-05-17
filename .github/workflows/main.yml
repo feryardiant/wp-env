@@ -22,6 +22,8 @@ jobs:
     name: with WP ${{ matrix.wp }} on PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     needs: [prepare]
+    outputs:
+      should-upload: ${{ steps.dist-archive.outputs.should-upload }}
 
     env:
       DB_NAME: ${{ github.repository_owner }}
@@ -105,17 +107,51 @@ jobs:
           vendor/bin/phpunit --coverage-text
 
       - name: Make dist archive
-        # if: github.event_name == 'push' && github.ref_name == 'main'
+        id: dist-archive
+        if: |-
+          github.event_name == 'push' && github.ref_name == 'main' &&
+          startsWith(github.event.head_commit.message, 'chore(release):')
         env:
           FORWARD_DB_PORT: ${{ job.services.mysql.ports['3306'] }}
         run: |
           scripts/make-dist.sh
 
-          cp assets/dist/custom-theme.zip assets/dist/custom-theme-copy.zip
-          ls -lah assets/dist
+          echo "should-upload=1" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v7
+        if: steps.dist-archive.outputs.should-upload == '1'
         with:
-          archive: false
+          name: release-archives
           overwrite: true
-          path: assets/dist/*.zip
+          path: assets/dist
+
+  update-releases:
+    name: Update released assets
+    needs: build
+    if: needs.build.outputs.should-upload == '1'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-archives
+          path: releases
+
+      - name: Update release assets
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          LATEST_COMMIT: ${{ github.event.head_commit.message }}
+        run: |
+          RELEASE_VERSION=$(echo "$LATEST_COMMIT" | head -n 1 | sed 's/chore(release): /v/')
+
+          shopt -s nullglob
+
+          for to_upload in releases/*.zip; do
+            [[ -z "$to_upload" || ! -f "$to_upload" ]] && continue
+
+            echo "Uploading $to_upload..."
+            gh release upload "$RELEASE_VERSION" "${to_upload}" --clobber
+          done
