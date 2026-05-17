@@ -124,47 +124,14 @@ jobs:
           path: assets/dist
 
   update-releases:
-    name: Update released assets
+    name: Update assets
     needs: tests
     if: |-
       needs.tests.outputs.should-upload == '1' &&
       startsWith(github.event.head_commit.message, 'chore(release):')
-    runs-on: ubuntu-latest
+    uses: projek-xyz/actions/.github/workflows/uploads.yml@main
+    with:
+      workflow_name: ${{ github.workflow }}
 
     permissions:
       contents: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: release-archives
-          path: assets/dist
-
-      - name: Update release assets
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          LATEST_COMMIT: ${{ github.event.head_commit.message }}
-        run: |
-          RELEASE_VERSION=$(echo "$LATEST_COMMIT" | head -n 1 | sed 's/chore(release): /v/')
-
-          for _ in {1..10}; do
-            echo "Checking for release $RELEASE_VERSION to be available..."
-            if gh release view "$RELEASE_VERSION" >/dev/null 2>&1; then
-              echo "Release $RELEASE_VERSION found!"
-              break
-            fi
-            sleep 5s
-          done
-
-          shopt -s nullglob
-
-          for to_upload in assets/dist/*.zip; do
-            [[ -z "$to_upload" || ! -f "$to_upload" ]] && continue
-
-            echo "Uploading $to_upload..."
-            gh release upload "$RELEASE_VERSION" "${to_upload}" --clobber
-          done
