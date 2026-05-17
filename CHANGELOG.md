@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.5](https://github.com/feryardiant/wp-env/compare/v0.0.4...v0.0.5) (2026-05-17)
+
+
+### Bug Fixes
+
+* **ci:** verify that release check is working ([a851dab](https://github.com/feryardiant/wp-env/commit/a851dab3ad1287e68325c3d592f73d85ac5905bc))
+
 ## [0.0.4](https://github.com/feryardiant/wp-env/compare/v0.0.3...v0.0.4) (2026-05-17)
 
 
