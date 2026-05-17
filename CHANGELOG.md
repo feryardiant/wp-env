@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.2](https://github.com/feryardiant/wp-env/compare/v0.0.1...v0.0.2) (2026-05-17)
+
+
+### Features
+
+* add ability to install more `plugins` and `themes` without activating them ([#14](https://github.com/feryardiant/wp-env/issues/14)) ([4e2df49](https://github.com/feryardiant/wp-env/commit/4e2df493132c5226c58a62c87d2d2f1c7cf3a275))
+* **ci:** automate distribution through github releases ([#21](https://github.com/feryardiant/wp-env/issues/21)) ([82ef0af](https://github.com/feryardiant/wp-env/commit/82ef0af59bf75a81d254545c32f09ea6d4125ee9))
+* **custom-theme:** rearrange `custom-theme` assets ([#13](https://github.com/feryardiant/wp-env/issues/13)) ([6b08e07](https://github.com/feryardiant/wp-env/commit/6b08e07233fed0db90a05edee9b85132e5a7188f))
+* ensure `woocommerce` options are applicable for multisite setup ([#16](https://github.com/feryardiant/wp-env/issues/16)) ([75a5efd](https://github.com/feryardiant/wp-env/commit/75a5efd86901310bee1540324a8fb7ce4a38fe86))
+* improve what's missing in [#9](https://github.com/feryardiant/wp-env/issues/9) ([#11](https://github.com/feryardiant/wp-env/issues/11)) ([d851b9c](https://github.com/feryardiant/wp-env/commit/d851b9c1d0be8a52f16a1e2521cffe5e65294535))
+* rearrange default media assets ([#12](https://github.com/feryardiant/wp-env/issues/12)) ([4d8325e](https://github.com/feryardiant/wp-env/commit/4d8325ee2715ce60e886354a38cbd819b4f48181))
+
+
+### Bug Fixes
+
+* don't install dev-dependencies during `make-dist.sh` ([5035b05](https://github.com/feryardiant/wp-env/commit/5035b058a632cf5077737c98924b9e1648ffda41))
+* make sure local `wp-cli` could work properly ([#19](https://github.com/feryardiant/wp-env/issues/19)) ([33fa3a4](https://github.com/feryardiant/wp-env/commit/33fa3a40e688f5f0ccaa49e89781f9675ee7a6f7))
+* make sure to run `make-pot` during `make-dist` ([#20](https://github.com/feryardiant/wp-env/issues/20)) ([55c8980](https://github.com/feryardiant/wp-env/commit/55c8980a04b86b3bf3fd21617ca5c20e12034ec9))
+
 ## 0.0.1 (2026-05-04)
 
 
