@@ -35,7 +35,7 @@ jobs:
       with:
         name: release-archives
         path: assets/dist
-        run-id: ${{ workflow_run.id }}
+        run-id: ${{ github.event.workflow_run.id }}
 
     - name: Prepare
       shell: bash
@@ -51,7 +51,6 @@ jobs:
 
     - name: Deploy
       id: deployed
-      if: github.event_name == 'push'
       uses: actions/deploy-pages@v5
       with:
         token: ${{ github.token }}
