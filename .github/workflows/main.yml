@@ -147,6 +147,17 @@ jobs:
         run: |
           RELEASE_VERSION=$(echo "$LATEST_COMMIT" | head -n 1 | sed 's/chore(release): /v/')
 
+          for _ in {1..10}; do
+            echo "Checking for release $RELEASE_VERSION to be available..."
+            gh release view "$RELEASE_VERSION" >/dev/null 2>&1 && break
+            sleep 5s
+          done
+
+          gh release view "$RELEASE_VERSION" >/dev/null 2>&1 || {
+            echo "Release $RELEASE_VERSION is not available yet" >&2
+            exit 1
+          }
+
           shopt -s nullglob
 
           for to_upload in releases/*.zip; do
