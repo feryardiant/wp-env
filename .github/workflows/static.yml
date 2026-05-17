@@ -2,7 +2,7 @@ name: Static
 
 on:
   workflow_run:
-    workflows: [Tests, Release]
+    workflows: [Tests]
     types: [completed]
     branches: [main]
 
@@ -14,11 +14,11 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: ${{ workflow_run.conclusion == 'success' }}
+    if: github.event.workflow_run.conclusion == 'success'
 
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployed.outputs.page_url }}
 
     permissions:
       pages: write
@@ -47,6 +47,7 @@ jobs:
         path: assets/dist
 
     - name: Deploy
+      id: deployed
       if: github.event_name == 'push'
       uses: actions/deploy-pages@v5
       with:
