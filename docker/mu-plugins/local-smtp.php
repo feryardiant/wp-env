@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Local SMTP
- * Plugin URI: https://github.com/feryardiant/wordpress-env
+ * Plugin URI: https://github.com/projek-xyz/wp-env
  * Description: Local SMTP mail configuration.
  * Version: 0.0.0
  * Author: Fery Wardiyanto

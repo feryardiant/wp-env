@@ -1,8 +1,8 @@
 {
-    "name": "feryardiant/wordpress-env",
+    "name": "projek-xyz/wp-env",
     "description": "A zero-config, Docker-based local environment designed for rapid evaluation of WordPress themes and plugins.",
     "keywords": [ "composer", "wordpress", "boilerplate" ],
-    "homepage": "https://github.com/feryardiant/wp-env/",
+    "homepage": "https://github.com/projek-xyz/wp-env/",
     "type": "project",
     "license": "MIT",
     "authors": [
@@ -14,7 +14,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@github.com:feryardiant/wp-env.git"
+            "url": "git@github.com:projek-xyz/wp-env.git"
         }
     ],
     "scripts": {
