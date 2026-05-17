@@ -135,10 +135,13 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - uses: actions/download-artifact@v8
         with:
           name: release-archives
-          path: releases
+          path: assets/dist
 
       - name: Update release assets
         shell: bash
@@ -159,7 +162,7 @@ jobs:
 
           shopt -s nullglob
 
-          for to_upload in releases/*.zip; do
+          for to_upload in assets/dist/*.zip; do
             [[ -z "$to_upload" || ! -f "$to_upload" ]] && continue
 
             echo "Uploading $to_upload..."
