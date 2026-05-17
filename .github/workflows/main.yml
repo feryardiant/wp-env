@@ -127,8 +127,8 @@ jobs:
 
   update-releases:
     name: Update released assets
-    needs: build
-    if: needs.build.outputs.should-upload == '1'
+    needs: tests
+    if: needs.tests.outputs.should-upload == '1'
     runs-on: ubuntu-latest
 
     permissions:
