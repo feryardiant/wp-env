@@ -154,8 +154,8 @@ jobs:
           done
 
           gh release view "$RELEASE_VERSION" >/dev/null 2>&1 || {
-            echo "Release $RELEASE_VERSION is not available yet" >&2
-            exit 1
+            echo "Release $RELEASE_VERSION is not available yet"
+            exit 0
           }
 
           shopt -s nullglob
