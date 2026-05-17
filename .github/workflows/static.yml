@@ -34,9 +34,11 @@ jobs:
     - name: Download artifacts
       uses: actions/download-artifact@v8
       with:
-        name: release-archives
         path: assets/dist
+        name: release-archives
         run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ github.token }}
+        merge-multiple: true
 
     - name: Prepare
       shell: bash
