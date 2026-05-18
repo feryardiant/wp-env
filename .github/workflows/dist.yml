@@ -45,7 +45,7 @@ jobs:
       id: caches
       run: |
         echo "composer-dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-        echo "wpcli-dir=$(wp cli info --format=json | jq '.wp_cli_cache_dir_path' | sed 's/"//g')" >> $GITHUB_OUTPUT
+        echo "wpcli-dir=$(wp cli info --format=json | jq -r '.wp_cli_cache_dir_path')" >> $GITHUB_OUTPUT
 
     - name: Set up Composer cache
       uses: actions/cache@v5
