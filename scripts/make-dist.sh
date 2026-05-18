@@ -16,6 +16,9 @@ for pkg_dir in packages/*/; do
         continue
     fi
 
+    pkg_version=$(cat "$pkg_dir/package.json" | jq -r '.version')
+    pkg_type=$(cat "$pkg_dir/composer.json" | jq -r '.type' | sed 's/wordpress-//')
+
     composer -d "$pkg_dir" install -q --no-dev
 
     rm -f "$ASSET_DIR/dist/$pkg"*.zip
@@ -24,7 +27,9 @@ for pkg_dir in packages/*/; do
 
     _wp i18n make-pot "$pkg_dir" "$pkg_dir/languages/$pkg.pot"
 
-    _wp dist-archive "$pkg_dir" "$ASSET_DIR/dist" --force --create-target-dir
+    _wp dist-archive "$pkg_dir" "$ASSET_DIR/dist" --force --create-target-dir --filename-format="{name}"
+
+    mv "$ASSET_DIR/dist/$pkg.zip" "$ASSET_DIR/dist/$pkg.$pkg_version.zip"
 
     rm "$pkg_dir"/{license.txt,composer.lock}
 done
