@@ -74,7 +74,7 @@ class Theme {
 		string $theme_stylesheet,
 	): array|false {
 		// Only handle our custom theme.
-		if ( 'custom-theme' !== $theme_stylesheet ) {
+		if ( \get_stylesheet() !== $theme_stylesheet ) {
 			return $update;
 		}
 
