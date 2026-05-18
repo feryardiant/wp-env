@@ -24,14 +24,11 @@ class FunctionsTest extends BaseTestCase
      */
     public function testThemeShouldQueueACustomScripts()
     {
-        Functions\when('wp_get_theme')->justReturn(new class {
-            public string $stylesheet = 'custom-theme';
-            public string $version = '0.0.1';
-            public function get_stylesheet_directory_uri(): string
-            {
-                return 'http://example.com/wp-content/themes/custom-theme';
-            }
-        });
+        Functions\when('wp_get_theme')->justReturn((object) [
+            'stylesheet' => 'custom-theme',
+            'version' => '0.0.1',
+            'stylesheet_dir' => 'http://example.com/wp-content/themes/custom-theme',
+        ]);
 
         Functions\when('wp_register_script')->justReturn();
         Functions\when('wp_enqueue_script')->justReturn();

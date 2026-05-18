@@ -38,6 +38,8 @@ class Theme {
 	}
 
 	/**
+	 * Enqueues the custom theme scripts.
+	 *
 	 * @return void
 	 */
 	public static function enqueue_scripts(): void {
@@ -45,7 +47,7 @@ class Theme {
 
 		\wp_register_script(
 			$theme->stylesheet,
-			$theme->get_stylesheet_directory_uri() . '/assets/custom.js',
+			$theme->stylesheet_dir . '/assets/custom.js',
 			array(),
 			$theme->version,
 			array( 'strategy' => 'defer' )
