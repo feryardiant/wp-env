@@ -92,7 +92,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer update --ansi --no-interaction --no-progress --no-suggest --prefer-dist
+          composer update --ansi --no-interaction --no-progress --prefer-dist
 
       - name: Set up WordPress
         shell: bash
