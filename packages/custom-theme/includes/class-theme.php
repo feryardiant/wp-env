@@ -78,22 +78,21 @@ class Theme {
 			return $update;
 		}
 
-		$update_data = self::get_updates();
+		$release = self::get_updates();
 
 		// Check if remote version is newer than current version.
-		if ( ! $update_data || version_compare( $update_data['version'], $theme_data['Version'], '<=' ) ) {
+		if ( ! $release || version_compare( $release->version, $theme_data['Version'], '<=' ) ) {
 			return $update;
 		}
 
 		// Return the update metadata for WordPress to handle.
 		return array(
-			'theme'        => '',
-			'package'      => '',
-			'version'      => $update_data['version'],
-			'url'          => '',
-			'description'  => '',
-			'tested'       => '',
-			'requires_php' => '',
+			'theme'        => $release->theme,
+			'package'      => $release->download_url,
+			'version'      => $release->version,
+			'url'          => $release->html_url,
+			'tested'       => $release->tested,
+			'requires_php' => $release->requires_php,
 			'translations' => array(),
 		);
 	}
@@ -103,9 +102,9 @@ class Theme {
 	 *
 	 * Uses site transients to cache the results and avoid excessive API calls.
 	 *
-	 * @return array|false The update data from GitHub on success, or false on failure.
+	 * @return object|false The update data from GitHub on success, or false on failure.
 	 */
-	public static function get_updates(): array|false {
+	public static function get_updates(): object|false {
 		$cache_key   = 'custom-theme_updates';
 		$cached_data = \get_site_transient( $cache_key );
 
@@ -130,11 +129,30 @@ class Theme {
 			return false;
 		}
 
-		$data = json_decode( \wp_remote_retrieve_body( $response ), true );
+		$data  = json_decode( \wp_remote_retrieve_body( $response ) );
+		$theme = \get_stylesheet();
+
+		$updates = array_filter(
+			$data->assets ?? array(),
+			static fn ( object $asset ) => str_starts_with( $asset->name, $theme )
+		)[0] ?? null;
+
+		$update = (object) array(
+			'theme'        => $theme,
+			'html_url'     => $data->html_url ?? '',
+			'prerelease'   => $data->prerelease ?? false,
+			'published_at' => $data->published_at ?? '',
+			'tag_name'     => $data->tag_name ?? '',
+			'version'      => $data->version ?? '',
+			'digest'       => $updates?->digest ?: '',
+			'download_url' => $updates?->browser_download_url ?: '',
+			'tested'       => '',
+			'requires_php' => '',
+		);
 
 		// Cache the response data for 12 hours.
-		\set_site_transient( $cache_key, $data, 12 * \HOUR_IN_SECONDS );
+		\set_site_transient( $cache_key, $update, 12 * \HOUR_IN_SECONDS );
 
-		return $data;
+		return $update;
 	}
 }

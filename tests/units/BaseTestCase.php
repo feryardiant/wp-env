@@ -34,6 +34,7 @@ abstract class BaseTestCase extends TestCase
             fn($a, $b) => array_merge($b, $a)
         );
 
+        Functions\when('get_stylesheet')->justReturn('custom-theme');
         Functions\when('get_stylesheet_directory')->justReturn(
             BASE_PATH . '/packages/custom-theme'
         );

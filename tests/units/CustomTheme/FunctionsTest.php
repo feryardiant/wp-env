@@ -130,7 +130,14 @@ class FunctionsTest extends BaseTestCase
     public function testReturnArrayWhenTheresSiteTransient()
     {
         $spy = Mockery::spy(Theme::class);
-        $updates = ['version' => '0.0.2'];
+        $updates = (object) [
+            'theme' => '',
+            'html_url' => '',
+            'download_url' => '',
+            'version' => '0.0.2',
+            'tested' => '6.9',
+            'requires_php' => '8.1',
+        ];
 
         Functions\when('get_site_transient')->justReturn($updates);
 
@@ -143,7 +150,6 @@ class FunctionsTest extends BaseTestCase
                 $this->assertArrayHasKey('package', $return);
                 $this->assertArrayHasKey('version', $return);
                 $this->assertArrayHasKey('url', $return);
-                $this->assertArrayHasKey('description', $return);
                 $this->assertArrayHasKey('tested', $return);
                 $this->assertArrayHasKey('requires_php', $return);
                 $this->assertArrayHasKey('translations', $return);
@@ -157,7 +163,14 @@ class FunctionsTest extends BaseTestCase
     public function testReturnArrayWhenTheresAnUpdateAvailable()
     {
         $spy = Mockery::spy(Theme::class);
-        $updates = ['version' => '0.0.2'];
+        $updates = (object) [
+            'theme' => '',
+            'html_url' => '',
+            'download_url' => '',
+            'version' => '0.0.2',
+            'tested' => '6.9',
+            'requires_php' => '8.1',
+        ];
 
         Functions\when('get_site_transient')->justReturn(false);
         Functions\when('set_site_transient')->justReturn();
@@ -176,7 +189,6 @@ class FunctionsTest extends BaseTestCase
                 $this->assertArrayHasKey('package', $return);
                 $this->assertArrayHasKey('version', $return);
                 $this->assertArrayHasKey('url', $return);
-                $this->assertArrayHasKey('description', $return);
                 $this->assertArrayHasKey('tested', $return);
                 $this->assertArrayHasKey('requires_php', $return);
                 $this->assertArrayHasKey('translations', $return);
