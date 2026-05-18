@@ -109,4 +109,4 @@ jobs:
 
       - name: Unit Test
         run: |
-          vendor/bin/phpunit --coverage-text
+          composer test --ansi -- --coverage-text
