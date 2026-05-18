@@ -109,4 +109,4 @@ jobs:
 
       - name: Unit Test
         run: |
-          composer test --ansi -- --coverage-text
+          composer test --ansi
