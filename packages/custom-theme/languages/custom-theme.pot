@@ -21,7 +21,7 @@ msgstr ""
 
 #. Theme URI of the theme
 #: style.css:4
-msgid "https://github.com/projek-xyz/local-wordpress"
+msgid "https://github.com/projek-xyz/wp-env/tree/main/packages/custom-theme"
 msgstr ""
 
 #. Description of the theme
